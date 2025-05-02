@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3 uid="uid://ciw5dmgaqravq"]
+
+[ext_resource type="Material" uid="uid://bjbbo2oikjjjq" path="res://Materiais/Base_Material(player).tres" id="1_cr4wk"]
+[ext_resource type="Material" uid="uid://druwwouu184cn" path="res://Materiais/Base_Material.tres" id="2_himew"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_2miw8"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_aavg0"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_xjyju"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(5.56319, -1.52527e-05, 0.00377619, 0.00401182, 0.0211438, 0.00165513, -0.00411156, -6.8356e-06, 5.11106, 0, -0.62566, 0)
+material_override = ExtResource("1_cr4wk")
+mesh = SubResource("BoxMesh_2miw8")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.801014, 0.598646, 0, -0.598646, 0.801014, 0.0472956, 2.56737, 4.1223)
+projection = 1
+size = 2.91801
+
+[node name="GridMap" type="GridMap" parent="."]
+cell_size = Vector3(0.25, 0.25, 0.25)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.899997, -0.274852, -0.338323, 0.00767373, -0.786024, 0.618148, -0.435829, 0.553735, 0.709529, 0, 2.91048, 5.6539)
+light_energy = 3.0
+
+[node name="Player" type="Node3D" parent="."]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, -0.0865854, 0)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Player"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player/StaticBody3D"]
+shape = SubResource("CapsuleShape3D_aavg0")
+
+[node name="Player" type="MeshInstance3D" parent="Player"]
+transform = Transform3D(1, 0.000305023, -0.00012815, -0.00030502, 1, 2.25017e-05, 0.000128157, -2.24593e-05, 1, 0, 0, 0)
+material_override = ExtResource("2_himew")
+mesh = SubResource("CapsuleMesh_xjyju")
