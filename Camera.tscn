@@ -1,42 +1,103 @@
-[gd_scene load_steps=6 format=3 uid="uid://ciw5dmgaqravq"]
+[gd_scene load_steps=14 format=3 uid="uid://ciw5dmgaqravq"]
 
-[ext_resource type="Material" uid="uid://bjbbo2oikjjjq" path="res://Materiais/Base_Material(player).tres" id="1_cr4wk"]
-[ext_resource type="Material" uid="uid://druwwouu184cn" path="res://Materiais/Base_Material.tres" id="2_himew"]
+[ext_resource type="Material" uid="uid://bjbbo2oikjjjq" path="res://Models/Materiais/Base_Material(player).tres" id="1_cr4wk"]
+[ext_resource type="PackedScene" uid="uid://ccr5nni1q50fk" path="res://Models/Environment/Block_Test_PlaceHolder.fbx" id="2_aavg0"]
+[ext_resource type="PackedScene" uid="uid://dc68khg1bhka7" path="res://Models/Assets/Chair_GameTest.fbx" id="3_a0f6b"]
+[ext_resource type="Script" uid="uid://55lxxpkhyy5j" path="res://Scripts/GameManager.cs" id="3_xjyju"]
+[ext_resource type="PackedScene" uid="uid://cpothth8a24wb" path="res://Models/Assets/Table_GameTest.fbx" id="4_07nfj"]
+[ext_resource type="PackedScene" uid="uid://ua8bq30i4ydb" path="res://Prefabs/player.tscn" id="4_lxp0o"]
+[ext_resource type="Material" uid="uid://cw2hxqp20nmfl" path="res://Models/Assets/Objetos/Material.002.tres" id="5_4656x"]
+[ext_resource type="ArrayMesh" uid="uid://5qwhgg2didc7" path="res://Models/Assets/Objetos/Tablee.obj" id="5_we8rk"]
+[ext_resource type="Script" uid="uid://cduux8tcw1er4" path="res://Scripts/CameraRig.cs" id="9_gmjel"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_2miw8"]
+size = Vector3(4.605, 0.04, 8)
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_aavg0"]
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_cr4wk"]
+points = PackedVector3Array(-2.46, -0.02, -2.365, -2.46, 0.02, -2.365, 2.46, -0.02, -2.365, -2.46, -0.02, 2.365, -2.46, 0.02, 2.365, 2.46, 0.02, -2.365, 2.46, -0.02, 2.365, 2.46, 0.02, 2.365)
 
-[sub_resource type="CapsuleMesh" id="CapsuleMesh_xjyju"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_8yu0k"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_we8rk"]
+size = Vector3(1, 0.165, 1)
 
 [node name="Node3D" type="Node3D"]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(5.56319, -1.52527e-05, 0.00377619, 0.00401182, 0.0211438, 0.00165513, -0.00411156, -6.8356e-06, 5.11106, 0, -0.62566, 0)
-material_override = ExtResource("1_cr4wk")
-mesh = SubResource("BoxMesh_2miw8")
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.801014, 0.598646, 0, -0.598646, 0.801014, 0.0472956, 2.56737, 4.1223)
-projection = 1
-size = 2.91801
-
-[node name="GridMap" type="GridMap" parent="."]
-cell_size = Vector3(0.25, 0.25, 0.25)
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.899997, -0.274852, -0.338323, 0.00767373, -0.786024, 0.618148, -0.435829, 0.553735, 0.709529, 0, 2.91048, 5.6539)
+transform = Transform3D(-0.899997, -0.274852, -0.338323, 0.00767373, -0.786024, 0.618148, -0.435829, 0.553735, 0.709528, -7.39471, 5.53545, 7.42431)
 light_energy = 3.0
 
-[node name="Player" type="Node3D" parent="."]
-transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, -0.0865854, 0)
+[node name="Environment" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.302399, 0.534739)
 
-[node name="StaticBody3D" type="StaticBody3D" parent="Player"]
+[node name="Place" type="Node3D" parent="Environment"]
+transform = Transform3D(4.19047, 0, 0, 0, 0.543502, 0, 0, 0, 4.19047, 0, -0.239942, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Player/StaticBody3D"]
-shape = SubResource("CapsuleShape3D_aavg0")
+[node name="StaticBody3D" type="StaticBody3D" parent="Environment/Place"]
 
-[node name="Player" type="MeshInstance3D" parent="Player"]
-transform = Transform3D(1, 0.000305023, -0.00012815, -0.00030502, 1, 2.25017e-05, 0.000128157, -2.24593e-05, 1, 0, 0, 0)
-material_override = ExtResource("2_himew")
-mesh = SubResource("CapsuleMesh_xjyju")
+[node name="Mesh" type="MeshInstance3D" parent="Environment/Place/StaticBody3D"]
+transform = Transform3D(1.84088, -0.000727921, 0.000745969, 0.00132753, 1.00907, 0.000326951, -0.00136053, -0.000326222, 1.00966, 0, 0, 0)
+material_override = ExtResource("1_cr4wk")
+mesh = SubResource("BoxMesh_2miw8")
+skeleton = NodePath("../../../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Place/StaticBody3D"]
+transform = Transform3D(1.73, -0.00124798, 0.00127818, 0.00124757, 1.73, 0.000560216, -0.00127858, -0.000559294, 1.73, 0, 0, 0)
+shape = SubResource("ConvexPolygonShape3D_cr4wk")
+
+[node name="Block_Test_PlaceHolder" parent="Environment/Place/StaticBody3D" instance=ExtResource("2_aavg0")]
+transform = Transform3D(0.0579642, 0, 0, 0, 0.441319, 0, 0, 0, 0.0579642, -1.39041, 0.211841, -0.387493)
+
+[node name="Chair_GameTest" parent="Environment/Place/StaticBody3D" instance=ExtResource("3_a0f6b")]
+transform = Transform3D(0.059, 0, 0, 0, 0.45, 0, 0, 0, 0.059, 0.0456795, 0.735504, -1.47521)
+
+[node name="Table_GameTest" parent="Environment/Place/StaticBody3D" instance=ExtResource("4_07nfj")]
+transform = Transform3D(0.059, 0, 0, 0, 0.45, 0, 0, 0, 0.059, 0.280945, 0.657569, -1.48849)
+
+[node name="Spawn" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.94838, 0.53223, -3.05796)
+
+[node name="Table" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.20987, 0.489672, -5.10522)
+
+[node name="Area3D" type="Area3D" parent="Table"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Table/Area3D"]
+transform = Transform3D(0.241885, 0, 0, 0, 0.241885, 0, 0, 0, 0.241885, -0.296925, 0, -0.920871)
+material_override = ExtResource("5_4656x")
+mesh = ExtResource("5_we8rk")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Table/Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.279361, 0.0823524, -0.937327)
+shape = SubResource("BoxShape3D_8yu0k")
+
+[node name="RigidBody3D" parent="." instance=ExtResource("4_lxp0o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.94282, 0.580925, 1.28968)
+CameraRigPath = NodePath("../Camera Position")
+
+[node name="Target_Player" type="Node3D" parent="RigidBody3D"]
+
+[node name="GridManager" type="Node3D" parent="."]
+
+[node name="Camera Position" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49013, 12.1603, 3.88901)
+script = ExtResource("9_gmjel")
+TargetPath = NodePath("../RigidBody3D/Target_Player")
+ZoomStep = 0.25
+ZoomMin = 6.0
+ZoomMax = 8.0
+
+[node name="Camera3D" type="Camera3D" parent="Camera Position"]
+transform = Transform3D(1, 0, 0, 0, 0.437068, 0.899428, 0, -0.899428, 0.437068, 0.013463, 2.03136, 1.9375)
+projection = 1
+size = 6.0
+
+[node name="GameManager" type="Node3D" parent="."]
+script = ExtResource("3_xjyju")
+
+[node name="Node3D" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.00792, 0.108473, 1.24656)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D"]
+mesh = SubResource("BoxMesh_we8rk")

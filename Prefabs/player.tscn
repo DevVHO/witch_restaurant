@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://ua8bq30i4ydb"]
+
+[ext_resource type="Script" uid="uid://ctulqr35bijv5" path="res://Scripts/PlayerControl.cs" id="1_5wxv7"]
+[ext_resource type="Material" uid="uid://druwwouu184cn" path="res://Models/Materiais/Base_Material.tres" id="1_y6xdh"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_5wxv7"]
+radius = 0.25
+height = 1.0
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_y5hcb"]
+radius = 0.25
+height = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_5wxv7"]
+size = Vector3(0.29, 0.165, 0.15)
+
+[node name="RigidBody3D" type="CharacterBody3D"]
+script = ExtResource("1_5wxv7")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_5wxv7")
+
+[node name="Player" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0.000305023, -0.00012815, -0.000305047, 1, -0.000186938, 0.000128093, 0.00018698, 1, 0, 0, 0)
+material_override = ExtResource("1_y6xdh")
+mesh = SubResource("CapsuleMesh_y5hcb")
+skeleton = NodePath("../..")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.225, -0.2)
+mesh = SubResource("BoxMesh_5wxv7")
