@@ -1,9 +1,23 @@
-[gd_scene load_steps=2 format=3 uid="uid://meyji33pyy2y"]
+[gd_scene load_steps=5 format=3 uid="uid://meyji33pyy2y"]
+
+[ext_resource type="Script" uid="uid://ni82jrwfol2b" path="res://Scripts/Tile.cs" id="1_1hq07"]
+[ext_resource type="Shader" uid="uid://b5um5434u6ie7" path="res://Prefabs/Tiles/Cell.gdshader" id="2_7ou04"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_we8rk"]
 size = Vector3(1, 0.165, 1)
 
-[node name="Node3D" type="Node3D"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xv250"]
+render_priority = 0
+shader = ExtResource("2_7ou04")
+shader_parameter/alpha_value = 0.5
+shader_parameter/base_color = Color(1, 1, 1, 0.560784)
+shader_parameter/border_color = Color(0, 0, 0, 1)
+shader_parameter/border_thickness = 0.05
+shader_parameter/tile_size = Vector3(1, 0.165, 1)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="Tile" type="Node3D"]
+script = ExtResource("1_1hq07")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_we8rk")
+surface_material_override/0 = SubResource("ShaderMaterial_xv250")

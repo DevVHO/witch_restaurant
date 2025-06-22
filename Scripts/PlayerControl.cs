@@ -6,15 +6,13 @@ public partial class PlayerControl : CharacterBody3D
 	[Export] public float Speed = 5.0f;
 	[Export] public float Gravity = 9.8f;
 
-	[Export] public NodePath CameraRigPath;
 	private CameraRig cameraRig;
 
 	private Vector3 _velocity = Vector3.Zero;
 
 	public override void _Ready()
 	{
-		if (CameraRigPath != null && !CameraRigPath.IsEmpty)
-			cameraRig = GetNode<CameraRig>(CameraRigPath);
+		cameraRig = GetTree().Root.FindChild("Camera_Position", true, false) as CameraRig;	
 	}
 
 	public override void _PhysicsProcess(double delta)

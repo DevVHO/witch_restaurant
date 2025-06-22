@@ -1,6 +1,10 @@
-using Godot;
-using System;
-
-public partial class Enum : Node
+namespace Game.Enums
 {
+    public enum TileState
+    {
+        Desocupado,
+        Ocupado,
+        Livre
+
+    }
 }

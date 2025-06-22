@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://ciw5dmgaqravq"]
+[gd_scene load_steps=15 format=3 uid="uid://ciw5dmgaqravq"]
 
 [ext_resource type="Material" uid="uid://bjbbo2oikjjjq" path="res://Models/Materiais/Base_Material(player).tres" id="1_cr4wk"]
 [ext_resource type="PackedScene" uid="uid://ccr5nni1q50fk" path="res://Models/Environment/Block_Test_PlaceHolder.fbx" id="2_aavg0"]
@@ -8,7 +8,9 @@
 [ext_resource type="PackedScene" uid="uid://ua8bq30i4ydb" path="res://Prefabs/player.tscn" id="4_lxp0o"]
 [ext_resource type="Material" uid="uid://cw2hxqp20nmfl" path="res://Models/Assets/Objetos/Material.002.tres" id="5_4656x"]
 [ext_resource type="ArrayMesh" uid="uid://5qwhgg2didc7" path="res://Models/Assets/Objetos/Tablee.obj" id="5_we8rk"]
+[ext_resource type="Script" uid="uid://b0jbij532pcxt" path="res://Scripts/GridManager.cs" id="9_4656x"]
 [ext_resource type="Script" uid="uid://cduux8tcw1er4" path="res://Scripts/CameraRig.cs" id="9_gmjel"]
+[ext_resource type="PackedScene" uid="uid://meyji33pyy2y" path="res://Prefabs/Tiles/Tile.tscn" id="10_gmjel"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_2miw8"]
 size = Vector3(4.605, 0.04, 8)
@@ -18,10 +20,10 @@ points = PackedVector3Array(-2.46, -0.02, -2.365, -2.46, 0.02, -2.365, 2.46, -0.
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_8yu0k"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_we8rk"]
-size = Vector3(1, 0.165, 1)
-
 [node name="Node3D" type="Node3D"]
+
+[node name="Target_Player2" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.774506, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.899997, -0.274852, -0.338323, 0.00767373, -0.786024, 0.618148, -0.435829, 0.553735, 0.709528, -7.39471, 5.53545, 7.42431)
@@ -36,7 +38,7 @@ transform = Transform3D(4.19047, 0, 0, 0, 0.543502, 0, 0, 0, 4.19047, 0, -0.2399
 [node name="StaticBody3D" type="StaticBody3D" parent="Environment/Place"]
 
 [node name="Mesh" type="MeshInstance3D" parent="Environment/Place/StaticBody3D"]
-transform = Transform3D(1.84088, -0.000727921, 0.000745969, 0.00132753, 1.00907, 0.000326951, -0.00136053, -0.000326222, 1.00966, 0, 0, 0)
+transform = Transform3D(1.84088, -0.000727921, 0.000745969, 0.00132753, 1.00907, 0.000326951, -0.00136053, -0.000326222, 1.00966, 0, 0.262053, 0)
 material_override = ExtResource("1_cr4wk")
 mesh = SubResource("BoxMesh_2miw8")
 skeleton = NodePath("../../../..")
@@ -72,32 +74,24 @@ skeleton = NodePath("../..")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.279361, 0.0823524, -0.937327)
 shape = SubResource("BoxShape3D_8yu0k")
 
-[node name="RigidBody3D" parent="." instance=ExtResource("4_lxp0o")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.94282, 0.580925, 1.28968)
-CameraRigPath = NodePath("../Camera Position")
-
-[node name="Target_Player" type="Node3D" parent="RigidBody3D"]
-
-[node name="GridManager" type="Node3D" parent="."]
-
-[node name="Camera Position" type="Node3D" parent="."]
+[node name="Camera_Position" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49013, 12.1603, 3.88901)
 script = ExtResource("9_gmjel")
-TargetPath = NodePath("../RigidBody3D/Target_Player")
+TargetPath = NodePath("../Target_Player2")
 ZoomStep = 0.25
 ZoomMin = 6.0
 ZoomMax = 8.0
 
-[node name="Camera3D" type="Camera3D" parent="Camera Position"]
+[node name="Camera3D" type="Camera3D" parent="Camera_Position"]
 transform = Transform3D(1, 0, 0, 0, 0.437068, 0.899428, 0, -0.899428, 0.437068, 0.013463, 2.03136, 1.9375)
 projection = 1
 size = 6.0
 
+[node name="GridManager" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.46837, 0.265399, -6.75736)
+script = ExtResource("9_4656x")
+TileScene = ExtResource("10_gmjel")
+JogadorScene = ExtResource("4_lxp0o")
+
 [node name="GameManager" type="Node3D" parent="."]
 script = ExtResource("3_xjyju")
-
-[node name="Node3D" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.00792, 0.108473, 1.24656)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D"]
-mesh = SubResource("BoxMesh_we8rk")
