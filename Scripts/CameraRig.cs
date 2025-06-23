@@ -1,5 +1,5 @@
-using Godot;
-using System;
+    using Godot;
+    using System;
 
 public partial class CameraRig : Node3D
 {
@@ -15,7 +15,7 @@ public partial class CameraRig : Node3D
 
     private Camera3D camera3d;
     public Node3D target;
-    private bool isLocked = true; 
+    private bool isLocked = true;
     public bool IsLocked => isLocked; // Travado por padrão
 
     public override void _Ready()
@@ -84,4 +84,6 @@ public partial class CameraRig : Node3D
             GlobalPosition += direction * FreeMoveSpeed * (float)delta;
         }
     }
+    
+        
 }

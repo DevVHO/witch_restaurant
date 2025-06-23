@@ -17,7 +17,7 @@ public partial class GridManager : Node3D
     public override void _Ready()
     {
         GenerateGrid();
-        Vector3I posicaoInicial = new Vector3I(5, 0, 5);
+        Vector3I posicaoInicial = new Vector3I(6, 0, 14);
         InstanciarJogadorNaGrid(posicaoInicial);
     }
 
@@ -109,35 +109,42 @@ public partial class GridManager : Node3D
     }
     public void InstanciarJogadorNaGrid(Vector3I gridPos)
     {
-        if (!grid.TryGetValue(gridPos, out var tile))
+            if (!grid.TryGetValue(gridPos, out var tile))
         {
             GD.PrintErr("Tile inválido: " + gridPos);
             return;
         }
 
-        // Instancia o jogador e posiciona
-        var jogador = JogadorScene.Instantiate<Node3D>();
-        jogador.GlobalPosition = tile.GlobalPosition;
+        var jogadorRaw = JogadorScene.Instantiate();
+        if (jogadorRaw is not CharacterBody3D jogador)
+        {
+            GD.PrintErr("O jogador instanciado não é um CharacterBody3D!");
+            return;
+        }
 
-        // Adiciona o jogador à cena
+        jogador.Position = tile.Position;
         AddChild(jogador);
 
-        // Busca a target na cena
-        Node3D target = GetTree().Root.FindChild("Target_Player2", true, false) as Node3D;
+        var target = GetTree().Root.FindChild("Target_Player2", true, false) as Node3D;
         if (target == null)
         {
             GD.PrintErr("Target_Player2 não encontrado!");
             return;
         }
 
-        // Salva a target e jogador para o método deferred
+        // Verificações defensivas
+        if (!IsInstanceValid(target))
+        {
+            GD.PrintErr("Target_Player2 não é válido.");
+            return;
+        }
+
+        // Salva os dados para o deferred
         _targetToReparent = target;
         _jogadorToParent = jogador;
 
-        // Chama o método deferred para alterar o parent da target
         CallDeferred(nameof(ReparentTarget));
-        
-        // Marca o tile como ocupado
+
         tile.Estado = TileState.Ocupado;
     }
 
@@ -155,15 +162,15 @@ public partial class GridManager : Node3D
             oldParent.RemoveChild(_targetToReparent);
 
         _jogadorToParent.AddChild(_targetToReparent);
-
-        // Ajusta posição local para ficar na mesma posição do jogador
         _targetToReparent.Position = Vector3.Zero;
 
-        // Limpa referências para evitar manter objetos desnecessariamente
+        // Atualiza manualmente a referência da CameraRig
+        CameraRig cameraRig = GetTree().Root.FindChild("CameraRig", true, false) as CameraRig;
+        if (cameraRig != null)
+            cameraRig.target = _targetToReparent;
+
         _targetToReparent = null;
         _jogadorToParent = null;
     }
-
-
-
+    
 }

@@ -74,6 +74,12 @@ skeleton = NodePath("../..")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.279361, 0.0823524, -0.937327)
 shape = SubResource("BoxShape3D_8yu0k")
 
+[node name="GridManager" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.46837, 0.265399, -6.75736)
+script = ExtResource("9_4656x")
+TileScene = ExtResource("10_gmjel")
+JogadorScene = ExtResource("4_lxp0o")
+
 [node name="Camera_Position" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49013, 12.1603, 3.88901)
 script = ExtResource("9_gmjel")
@@ -86,12 +92,6 @@ ZoomMax = 8.0
 transform = Transform3D(1, 0, 0, 0, 0.437068, 0.899428, 0, -0.899428, 0.437068, 0.013463, 2.03136, 1.9375)
 projection = 1
 size = 6.0
-
-[node name="GridManager" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.46837, 0.265399, -6.75736)
-script = ExtResource("9_4656x")
-TileScene = ExtResource("10_gmjel")
-JogadorScene = ExtResource("4_lxp0o")
 
 [node name="GameManager" type="Node3D" parent="."]
 script = ExtResource("3_xjyju")
