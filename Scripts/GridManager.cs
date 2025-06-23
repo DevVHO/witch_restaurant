@@ -2,12 +2,12 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using Game.Enums;
+using Game.Interfaces;
 
 public partial class GridManager : Node3D
 {
     [Export] public PackedScene TileScene { get; set; }
     [Export] public PackedScene JogadorScene { get; set; }
-
     private Dictionary<Vector3I, Tile> grid = new();
 
     private const int GRID_WIDTH = 15;
@@ -83,17 +83,17 @@ public partial class GridManager : Node3D
         return vizinhos;
     }
 
-    public bool OcuparTile(Vector3I pos, KitchenObject ocupante)
+    public bool OcuparTile(Vector3I pos, IOcupanteTile ocupante)
     {
-        if (!grid.ContainsKey(pos))
-            return false;
+        if (!grid.ContainsKey(pos)) return false;
 
         Tile tile = grid[pos];
-        if (!tile.EstaLivre())
-            return false;
+        if (!tile.EstaLivre()) return false;
 
         tile.Estado = TileState.Ocupado;
         tile.Ocupante = ocupante;
+        ocupante.PosicaoNaGrid = pos;
+
         return true;
     }
 
@@ -109,7 +109,7 @@ public partial class GridManager : Node3D
     }
     public void InstanciarJogadorNaGrid(Vector3I gridPos)
     {
-            if (!grid.TryGetValue(gridPos, out var tile))
+        if (!grid.TryGetValue(gridPos, out var tile))
         {
             GD.PrintErr("Tile inválido: " + gridPos);
             return;
@@ -172,5 +172,9 @@ public partial class GridManager : Node3D
         _targetToReparent = null;
         _jogadorToParent = null;
     }
+
+    //Interface
+
+
     
 }

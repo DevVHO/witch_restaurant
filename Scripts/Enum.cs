@@ -2,9 +2,7 @@ namespace Game.Enums
 {
     public enum TileState
     {
-        Desocupado,
-        Ocupado,
-        Livre
-
+        Livre,
+        Ocupado
     }
 }

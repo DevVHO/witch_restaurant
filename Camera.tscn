@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://dc68khg1bhka7" path="res://Models/Assets/Chair_GameTest.fbx" id="3_a0f6b"]
 [ext_resource type="Script" uid="uid://55lxxpkhyy5j" path="res://Scripts/GameManager.cs" id="3_xjyju"]
 [ext_resource type="PackedScene" uid="uid://cpothth8a24wb" path="res://Models/Assets/Table_GameTest.fbx" id="4_07nfj"]
-[ext_resource type="PackedScene" uid="uid://ua8bq30i4ydb" path="res://Prefabs/player.tscn" id="4_lxp0o"]
+[ext_resource type="PackedScene" uid="uid://ua8bq30i4ydb" path="res://Models/player.tscn" id="4_lxp0o"]
 [ext_resource type="Material" uid="uid://cw2hxqp20nmfl" path="res://Models/Assets/Objetos/Material.002.tres" id="5_4656x"]
 [ext_resource type="ArrayMesh" uid="uid://5qwhgg2didc7" path="res://Models/Assets/Objetos/Tablee.obj" id="5_we8rk"]
 [ext_resource type="Script" uid="uid://b0jbij532pcxt" path="res://Scripts/GridManager.cs" id="9_4656x"]

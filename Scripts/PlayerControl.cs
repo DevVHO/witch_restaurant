@@ -1,8 +1,12 @@
 using Godot;
 using System;
+using Game.Interfaces;
 
-public partial class PlayerControl : CharacterBody3D
+public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 {
+
+	public Vector3I PosicaoNaGrid { get; set; }
+
 	[Export] public float Speed = 5.0f;
 	[Export] public float Gravity = 9.8f;
 
@@ -12,7 +16,7 @@ public partial class PlayerControl : CharacterBody3D
 
 	public override void _Ready()
 	{
-		cameraRig = GetTree().Root.FindChild("Camera_Position", true, false) as CameraRig;	
+		cameraRig = GetTree().Root.FindChild("Camera_Position", true, false) as CameraRig;
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -31,9 +35,9 @@ public partial class PlayerControl : CharacterBody3D
 			Velocity = _velocity;
 			MoveAndSlide();
 			return;
-			
+
 		}
-		
+
 		HandlePlayerMovement(delta);
 	}
 
@@ -78,5 +82,9 @@ public partial class PlayerControl : CharacterBody3D
 
 		Velocity = _velocity;
 		MoveAndSlide();
+	}
+	public void AtualizarPosicaoNaGrid(Vector3I novaPosicao)
+	{
+		PosicaoNaGrid = novaPosicao;
 	}
 }
