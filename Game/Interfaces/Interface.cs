@@ -1,4 +1,5 @@
 using Godot;
+using Game.Enums;
 
 namespace Game.Interfaces
 {

@@ -1,5 +1,5 @@
 
-namespace Game.Enums
+namespace Witch_Restaurant.Scripts
 {
     public enum TileState
     {
@@ -7,4 +7,5 @@ namespace Game.Enums
         Ocupado,
         Bloqueado
     }
+
 }

@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bahoah3eytfqm"]
+
+[ext_resource type="Script" uid="uid://dytnrbnvahenx" path="res://Scripts/Prefabs/Chair.cs" id="1_vi5a6"]
+[ext_resource type="ArrayMesh" uid="uid://dxrhnts4cog7g" path="res://Models/Assets/Objetos/Chair.obj" id="1_w7b8i"]
+
+[node name="Chair" type="Node3D"]
+script = ExtResource("1_vi5a6")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.305, 0, 0, 0, 0.305, 0, 0, 0, 0.305, -0.0753951, 0, -0.0319535)
+mesh = ExtResource("1_w7b8i")

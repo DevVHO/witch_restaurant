@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://bl1rc47irptjd"]
+
+[ext_resource type="Script" uid="uid://dttyvj54h5187" path="res://Scripts/Prefabs/Pia.cs" id="1_qg62g"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ql736"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qg62g"]
+albedo_color = Color(0.250814, 0.453753, 1, 1)
+
+[node name="Pia" type="Node3D"]
+script = ExtResource("1_qg62g")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_ql736")
+surface_material_override/0 = SubResource("StandardMaterial3D_qg62g")

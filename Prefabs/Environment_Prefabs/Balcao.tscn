@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://dwo7hio4pl0s6"]
+
+[ext_resource type="Script" uid="uid://civ4iwtsw7eih" path="res://Scripts/Prefabs/Balcao.cs" id="1_pvgn1"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ey161"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pvgn1"]
+albedo_color = Color(0.16077, 0.044173, 0.00226781, 1)
+
+[node name="Balcão" type="Node3D"]
+script = ExtResource("1_pvgn1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.65, 0, 0, 0, 0.65, 0, 0, 0, 0.65, 0, 0, 0)
+mesh = SubResource("BoxMesh_ey161")
+surface_material_override/0 = SubResource("StandardMaterial3D_pvgn1")

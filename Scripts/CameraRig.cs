@@ -1,5 +1,6 @@
-    using Godot;
-    using System;
+using Godot;
+using System;
+using Game.Enums;
 
 public partial class CameraRig : Node3D
 {
@@ -84,6 +85,6 @@ public partial class CameraRig : Node3D
             GlobalPosition += direction * FreeMoveSpeed * (float)delta;
         }
     }
-    
-        
+
+
 }

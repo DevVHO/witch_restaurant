@@ -6,9 +6,17 @@ using Game.Interfaces;
 
 public partial class GridManager : Node3D
 {
+
+    [Export] public NodePath SymbolMapNodePath;
+    private KitchenObjectSymbolMap symbolMap;
+    private Dictionary<char, PackedScene> mapaKitchenObjects;
+
     [Export] public PackedScene TileScene { get; set; }
     [Export] public PackedScene JogadorScene { get; set; }
+
     private Dictionary<Vector3I, Tile> grid = new();
+    private Dictionary<char, TileState> mapaEstadosTile;
+
 
     private const int GRID_WIDTH = 15;
     private const int GRID_HEIGHT = 15;
@@ -16,45 +24,117 @@ public partial class GridManager : Node3D
 
     public override void _Ready()
     {
+        symbolMap = GetNode<KitchenObjectSymbolMap>(SymbolMapNodePath);
+        mapaKitchenObjects = symbolMap.CriarMapaCenas();
+        mapaEstadosTile = symbolMap.CriarMapaEstados();
         GenerateGrid();
         Vector3I posicaoInicial = new Vector3I(6, 0, 14);
         InstanciarJogadorNaGrid(posicaoInicial);
     }
-
     public void GenerateGrid()
     {
         grid.Clear();
 
-        // Instancia temporariamente o tile para medir o tamanho
+        // Tile temporário para obter tamanho
         Tile tileTemp = TileScene.Instantiate<Tile>();
-        AddChild(tileTemp); // Precisa estar na scene para que as propriedades de transformação funcionem
-
-        // Supondo que o tile use um MeshInstance3D como filho direto
+        AddChild(tileTemp);
         Aabb bounds = tileTemp.GetChild<MeshInstance3D>(0).GetAabb();
         Vector3 tileSize = bounds.Size;
-
         RemoveChild(tileTemp);
-        tileTemp.QueueFree(); // Remove o tile temporário da cena
+        tileTemp.QueueFree();
 
-        // Começa a instanciar os tiles reais com base no tamanho detectado
-        for (int x = 0; x < GRID_WIDTH; x++)
+        for (int z = 0; z < layoutMapa.Length; z++)
         {
-            for (int z = 0; z < GRID_HEIGHT; z++)
+            string linha = layoutMapa[z];
+            for (int x = 0; x < linha.Length; x++)
             {
+
+                char simbolo = linha[x];
                 Vector3I gridPos = new Vector3I(x, 0, z);
                 Vector3 worldPos = new Vector3(x * tileSize.X, 0, z * tileSize.Z);
 
-                Tile tile = TileScene.Instantiate<Tile>();
-                tile.Position = worldPos;
-                tile.Posicao = gridPos;
-                tile.Estado = TileState.Livre;
-                tile.Ocupante = null;
+                Tile tile = null;
 
-                AddChild(tile);
-                grid[gridPos] = tile;
+                // 1. Caso símbolo seja 'V', instancia o tile padrão
+                if (simbolo == 'V')
+                {
+                    tile = TileScene.Instantiate<Tile>();
+                    tile.Position = worldPos;
+                    tile.Posicao = gridPos;
+                    tile.Estado = TileState.Livre;
+                    AddChild(tile);
+                }
+                else
+                {
+                    // 2. Para outros símbolos, instancia o prefab correspondente
+                    if (mapaKitchenObjects.TryGetValue(simbolo, out var cena) && cena != null)
+                    {
+                        var instance = cena.Instantiate();
+
+                        if (instance is KitchenObject obj)
+                        {
+                            obj.Position = worldPos;
+                            AddChild(obj);
+
+                            // 3. Cria tile para acompanhar a lógica, mesmo se não visual
+                            tile = TileScene.Instantiate<Tile>();
+                            tile.Position = worldPos;
+                            tile.Posicao = gridPos;
+                            tile.Ocupante = obj;
+
+                            // Define o estado baseado no mapa de estados
+                            if (mapaEstadosTile.TryGetValue(simbolo, out var estado))
+                            {
+                                tile.Estado = estado;
+                            }
+                            else
+                            {
+                                tile.Estado = TileState.Bloqueado; // fallback seguro
+                            }
+
+                            AddChild(tile);
+                        }
+                        else
+                        {
+                            GD.PrintErr($"Instância de símbolo '{simbolo}' NÃO É KitchenObject! Tipo real: {instance.GetType()}");
+                        }
+                    }
+                    else
+                    {
+                        GD.PrintErr($"Nenhuma cena encontrada para símbolo '{simbolo}'");
+                        continue;
+                    }
+                }
+
+                // 4. Sempre adiciona tile à grid lógica
+                if (tile != null)
+                {
+                    grid[gridPos] = tile;
+                }
             }
         }
     }
+
+
+    private string[] layoutMapa = new string[]
+    {
+        "VVVVVVVVVVVVVVV",
+        "VVVVVVVVVVVVVVV",
+        "VVVVVVVVVVVVVVV",
+        "VVVVVVVVVVVVVVV",
+        "VVVVVVVVVVVVVVV",
+        "VVVVVVVVVVVVVVV",
+        "VVVVVVVVVVVVVVV",
+        "VVVVVVVVVVVVVVV",
+        "BBBBBVVVVVVVVVV",
+        "VVVVVVVVVVVVVVV",
+        "VVVVBVVVVVVVVVV",
+        "VVVVBVVVVVVVVVV",
+        "BBBBBVVVVVVVVVV",
+        "VVVVVVVVVVVVVVV",
+        "VVVVVVVVVVVVVVV"
+    };
+
 
 
     public Tile GetTile(Vector3I pos)
@@ -174,7 +254,5 @@ public partial class GridManager : Node3D
     }
 
     //Interface
-
-
     
 }

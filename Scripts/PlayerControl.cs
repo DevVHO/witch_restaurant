@@ -1,10 +1,10 @@
 using Godot;
 using System;
 using Game.Interfaces;
+using Game.Enums;
 
 public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 {
-
 	public Vector3I PosicaoNaGrid { get; set; }
 
 	[Export] public float Speed = 5.0f;

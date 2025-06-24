@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://b27s0cgs5skg7"]
+
+[ext_resource type="Script" uid="uid://cjp2jww88hr3r" path="res://Scripts/Prefabs/Table.cs" id="1_aao80"]
+[ext_resource type="ArrayMesh" uid="uid://5qwhgg2didc7" path="res://Models/Assets/Objetos/Tablee.obj" id="1_bk060"]
+
+[node name="Table" type="Node3D"]
+transform = Transform3D(0.225, 0, 0, 0, 0.225, 0, 0, 0, 0.225, 0, 0, 0)
+script = ExtResource("1_aao80")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_bk060")
