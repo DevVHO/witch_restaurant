@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://ciw5dmgaqravq"]
+[gd_scene load_steps=15 format=3 uid="uid://ciw5dmgaqravq"]
 
 [ext_resource type="Material" uid="uid://bjbbo2oikjjjq" path="res://Models/Materiais/Base_Material(player).tres" id="1_cr4wk"]
 [ext_resource type="PackedScene" uid="uid://1yuwjd818iuj" path="res://Prefabs/Environment_Prefabs/fogao.tscn" id="3_8yu0k"]
@@ -6,8 +6,8 @@
 [ext_resource type="Script" uid="uid://55lxxpkhyy5j" path="res://Scripts/GameManager.cs" id="3_xjyju"]
 [ext_resource type="PackedScene" uid="uid://ua8bq30i4ydb" path="res://Models/player.tscn" id="4_lxp0o"]
 [ext_resource type="PackedScene" uid="uid://bl1rc47irptjd" path="res://Prefabs/Environment_Prefabs/Pia.tscn" id="4_tim8x"]
-[ext_resource type="PackedScene" uid="uid://b27s0cgs5skg7" path="res://Prefabs/Environment_Prefabs/Table.tscn" id="5_8pq3l"]
-[ext_resource type="PackedScene" uid="uid://bahoah3eytfqm" path="res://Prefabs/Environment_Prefabs/Chair.tscn" id="6_6usox"]
+[ext_resource type="PackedScene" uid="uid://dlpniyho3no8y" path="res://Prefabs/Environment_Prefabs/Table.tscn" id="5_8pq3l"]
+[ext_resource type="PackedScene" uid="uid://ds3112n2vvdr2" path="res://Prefabs/Environment_Prefabs/Chair.tscn" id="6_6usox"]
 [ext_resource type="PackedScene" uid="uid://dwo7hio4pl0s6" path="res://Prefabs/Environment_Prefabs/Balcao.tscn" id="7_8yu0k"]
 [ext_resource type="Script" uid="uid://b0jbij532pcxt" path="res://Scripts/GridManager.cs" id="9_4656x"]
 [ext_resource type="Script" uid="uid://cduux8tcw1er4" path="res://Scripts/CameraRig.cs" id="9_gmjel"]
@@ -18,8 +18,6 @@ size = Vector3(4.605, 0.04, 8)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_cr4wk"]
 points = PackedVector3Array(-2.46, -0.02, -2.365, -2.46, 0.02, -2.365, 2.46, -0.02, -2.365, -2.46, -0.02, 2.365, -2.46, 0.02, 2.365, 2.46, 0.02, -2.365, 2.46, -0.02, 2.365, 2.46, 0.02, 2.365)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_8yu0k"]
 
 [node name="Node3D" type="Node3D"]
 
@@ -50,15 +48,6 @@ shape = SubResource("ConvexPolygonShape3D_cr4wk")
 
 [node name="Spawn" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.94838, 0.53223, -3.05796)
-
-[node name="Table" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.20987, 0.489672, -5.10522)
-
-[node name="Area3D" type="Area3D" parent="Table"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Table/Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.279361, 0.0823524, -0.937327)
-shape = SubResource("BoxShape3D_8yu0k")
 
 [node name="KitchenObjectMap" type="Node3D" parent="."]
 script = ExtResource("3_gmjel")

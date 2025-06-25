@@ -1,11 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://b27s0cgs5skg7"]
+[gd_scene load_steps=3 format=3 uid="uid://dlpniyho3no8y"]
 
 [ext_resource type="Script" uid="uid://cjp2jww88hr3r" path="res://Scripts/Prefabs/Table.cs" id="1_aao80"]
-[ext_resource type="ArrayMesh" uid="uid://5qwhgg2didc7" path="res://Models/Assets/Objetos/Tablee.obj" id="1_bk060"]
+[ext_resource type="ArrayMesh" uid="uid://cropbha2r2fi" path="res://Models/Assets/Objetos/Table_Update.obj" id="2_aao80"]
 
 [node name="Table" type="Node3D"]
-transform = Transform3D(0.225, 0, 0, 0, 0.225, 0, 0, 0, 0.225, 0, 0, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 script = ExtResource("1_aao80")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = ExtResource("1_bk060")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.965, 0)
+mesh = ExtResource("2_aao80")
+
+[node name="NodePath" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.43688, 1.965, 0.831376)

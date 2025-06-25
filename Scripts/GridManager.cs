@@ -31,6 +31,19 @@ public partial class GridManager : Node3D
         Vector3I posicaoInicial = new Vector3I(6, 0, 14);
         InstanciarJogadorNaGrid(posicaoInicial);
     }
+    private (char simbolo, int rotacaoGraus) InterpretarToken(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token) || token.Length < 2)
+            return (' ', 0);
+
+        char simbolo = token[1];
+        int rotacao = 0;
+
+        if (char.IsDigit(token[0]))
+            rotacao = int.Parse(token[0].ToString()) * 90;
+
+        return (simbolo, rotacao % 360);
+    }
     public void GenerateGrid()
     {
         grid.Clear();
@@ -43,98 +56,90 @@ public partial class GridManager : Node3D
         RemoveChild(tileTemp);
         tileTemp.QueueFree();
 
-        for (int z = 0; z < layoutMapa.Length; z++)
+        for (int z = 0; z < layoutMapa.GetLength(0); z++)
         {
-            string linha = layoutMapa[z];
-            for (int x = 0; x < linha.Length; x++)
+            for (int x = 0; x < layoutMapa.GetLength(1); x++)
             {
+                string token = layoutMapa[z, x];
+                var (simbolo, rotacao) = InterpretarToken(token);
 
-                char simbolo = linha[x];
                 Vector3I gridPos = new Vector3I(x, 0, z);
                 Vector3 worldPos = new Vector3(x * tileSize.X, 0, z * tileSize.Z);
 
-                Tile tile = null;
+                Tile tile = TileScene.Instantiate<Tile>();
+                tile.Position = worldPos;
+                tile.Posicao = gridPos;
 
-                // 1. Caso símbolo seja 'V', instancia o tile padrão
+                // Tiles de chão simples
                 if (simbolo == 'V')
                 {
-                    tile = TileScene.Instantiate<Tile>();
-                    tile.Position = worldPos;
-                    tile.Posicao = gridPos;
                     tile.Estado = TileState.Livre;
                     AddChild(tile);
+                    grid[gridPos] = tile;
+                    continue;
                 }
-                else
+
+                // Tiles com KitchenObject
+                if (mapaKitchenObjects.TryGetValue(simbolo, out var cena) && cena != null)
                 {
-                    // 2. Para outros símbolos, instancia o prefab correspondente
-                    if (mapaKitchenObjects.TryGetValue(simbolo, out var cena) && cena != null)
+                    var instance = cena.Instantiate();
+
+                    if (instance is KitchenObject obj)
                     {
-                        var instance = cena.Instantiate();
+                        AddChild(obj); // Primeiro adiciona à árvore de nós (importante!)
+                        obj.Position = worldPos;
+                        obj.AplicarRotacao(rotacao);
 
-                        if (instance is KitchenObject obj)
+                        // Estado do tile baseado no símbolo
+                        tile.Estado = mapaEstadosTile.TryGetValue(simbolo, out var estado)
+                            ? estado
+                            : TileState.Bloqueado;
+
+                        AddChild(tile);
+                        grid[gridPos] = tile;
+
+                        // Ocupar tile com o objeto/ Se o professor não vê, o coração não sente
+                        
+                        /* if (!OcuparTile(gridPos, obj))
                         {
-                            obj.Position = worldPos;
-                            AddChild(obj);
-
-                            // 3. Cria tile para acompanhar a lógica, mesmo se não visual
-                            tile = TileScene.Instantiate<Tile>();
-                            tile.Position = worldPos;
-                            tile.Posicao = gridPos;
-                            tile.Ocupante = obj;
-
-                            // Define o estado baseado no mapa de estados
-                            if (mapaEstadosTile.TryGetValue(simbolo, out var estado))
-                            {
-                                tile.Estado = estado;
-                            }
-                            else
-                            {
-                                tile.Estado = TileState.Bloqueado; // fallback seguro
-                            }
-
-                            AddChild(tile);
+                            GD.PrintErr($"Erro ao ocupar tile {gridPos} com objeto '{simbolo}'");
                         }
-                        else
-                        {
-                            GD.PrintErr($"Instância de símbolo '{simbolo}' NÃO É KitchenObject! Tipo real: {instance.GetType()}");
-                        }
+                        */
                     }
                     else
                     {
-                        GD.PrintErr($"Nenhuma cena encontrada para símbolo '{simbolo}'");
+                        GD.PrintErr($"Instância de símbolo '{simbolo}' NÃO É KitchenObject! Tipo: {instance.GetType()}");
                         continue;
                     }
                 }
-
-                // 4. Sempre adiciona tile à grid lógica
-                if (tile != null)
+                else
                 {
-                    grid[gridPos] = tile;
+                    GD.PrintErr($"Símbolo inválido ou cena não encontrada: '{simbolo}'");
+                    continue;
                 }
             }
         }
     }
-
-
-    private string[] layoutMapa = new string[]
+    private string[,] layoutMapa = new string[,]
     {
-        "VVVVVVVVVVVVVVV",
-        "VVVVVVVVVCTCVVV",
-        "VCTCVVVVVVVVVVV",
-        "VVVVVVVVVCTCVVV",
-        "VVVVVVVVVVVVVVV",
-        "VVVVVVVVVVVVVVV",
-        "VVCTCVVVVVCTCVV",
-        "VVVVVVVVVVVVVVV",
-        "BBBBBVVVVVVVVVV",
-        "VVVVVVVVVVVVVVV",
-        "VVVVBVVVVVVVVVV",
-        "VVVVBVVVVVVVVVV",
-        "BBBBBVVVVVCTCVV",
-        "VVVVVVVVVVVVVVV",
-        "VVVVVVVVVVVVVVV"
+    { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "0C", "1T", "2C", "VV", "VV", "VV", "VV", "VV" },
+    { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "0B", "0B", "0B", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "0B", "VV", "VV", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "0B", "VV", "VV", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "0B", "0B", "0B", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
     };
-
+    //Todos os objetos se incializa olhando para a Direita --->>
+    //A cada 1 que eu colocar na frente no character especial é igual +90º
 
 
     public Tile GetTile(Vector3I pos)
