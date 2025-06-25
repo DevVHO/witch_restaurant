@@ -2,89 +2,178 @@ using Godot;
 using System;
 using Game.Interfaces;
 using Game.Enums;
+using System.Collections.Generic;
 
 public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 {
 	public Vector3I PosicaoNaGrid { get; set; }
 
-	[Export] public float Speed = 5.0f;
+	[Export] public float Speed = 6.0f; // tiles/segundo
 	[Export] public float Gravity = 9.8f;
+	[Export] public float RotationSpeed = 30.0f;
+	[Export] public float PressThreshold = 0.13f;
 
 	private CameraRig cameraRig;
+	private GridManager gridManager;
+	private bool isMovingTile = false;
 
-	private Vector3 _velocity = Vector3.Zero;
+	private Vector3 destinoMundo;
+	private Vector3I destinoGrid;
+	private float targetYaw = 0f;
+
+	private Dictionary<string, float> inputPressTime = new();
+	private string currentKey = null;
+	private Vector3I inputDirection = Vector3I.Zero;
 
 	public override void _Ready()
 	{
 		cameraRig = GetTree().Root.FindChild("Camera_Position", true, false) as CameraRig;
+		gridManager = GetTree().Root.FindChild("GridManager", true, false) as GridManager;
 	}
 
 	public override void _PhysicsProcess(double delta)
 	{
-		if (cameraRig != null && !cameraRig.IsLocked)
+		// Se estiver em movimento, permitir que termine mesmo com câmera destravada
+		if (isMovingTile)
 		{
-			// Câmera destravada: jogador parado
-			_velocity.X = 0;
-			_velocity.Z = 0;
+			// Continua interpolando até o destino
+			Position = Position.MoveToward(destinoMundo, Speed * (float)delta);
+			if (Position.DistanceTo(destinoMundo) < 0.01f)
+			{
+				Position = destinoMundo;
+				AtualizarPosicaoNaGrid(destinoGrid);
+				isMovingTile = false;
 
-			if (!IsOnFloor())
-				_velocity.Y -= Gravity * (float)delta;
-			else
-				_velocity.Y = 0;
+				// Só tenta mover de novo se a câmera estiver travada
+				if (cameraRig != null && cameraRig.IsLocked && currentKey != null && Input.IsActionPressed(currentKey))
+					TentarMover(inputDirection, currentKey);
+			}
+			return;
+		}
 
-			Velocity = _velocity;
+		// Não faz mais nada se a câmera estiver destravada e não estamos movendo
+		if (cameraRig == null || !cameraRig.IsLocked)
+		{
+			Velocity = Vector3.Zero;
 			MoveAndSlide();
 			return;
-
 		}
 
-		HandlePlayerMovement(delta);
+		// Atualiza input e aplica rotação
+		UpdateInputTimers();
+
+		float currentYaw = Rotation.Y;
+		currentYaw = Mathf.LerpAngle(currentYaw, targetYaw, RotationSpeed * (float)delta);
+		Rotation = new Vector3(0, currentYaw, 0);
+
+		HandlePlayerMovement();
 	}
 
-	private void HandlePlayerMovement(double delta)
-	{
-		float inputX = 0.0f;
-		float inputZ = 0.0f;
 
-		foreach (string action in new[] { "Walk_Left", "Walk_Right", "Walk_Front", "Walk_Back" })
+	private void UpdateInputTimers()
+	{
+		var keys = new[] { "Walk_Left", "Walk_Right", "Walk_Front", "Walk_Back" };
+		foreach (var key in keys)
 		{
-			if (Input.IsActionPressed(action) && cameraRig.IsLocked)
+			if (Input.IsActionPressed(key))
 			{
-				switch (action)
-				{
-					case "Walk_Left":
-						inputX += 1.0f;
-						break;
-					case "Walk_Right":
-						inputX -= 1.0f;
-						break;
-					case "Walk_Front":
-						inputZ -= 1.0f;
-						break;
-					case "Walk_Back":
-						inputZ += 1.0f;
-						break;
-				}
+				if (!inputPressTime.ContainsKey(key))
+					inputPressTime[key] = 0f;
+
+				inputPressTime[key] += (float)GetProcessDeltaTime();
+			}
+			else
+			{
+				inputPressTime.Remove(key);
 			}
 		}
-
-		Vector3 direction = new Vector3(inputX, 0, inputZ).Normalized();
-		direction = Transform.Basis * direction;
-		direction.Y = 0;
-
-		_velocity.X = direction.X * Speed;
-		_velocity.Z = direction.Z * Speed;
-
-		if (!IsOnFloor())
-			_velocity.Y -= Gravity * (float)delta;
-		else
-			_velocity.Y = 0;
-
-		Velocity = _velocity;
-		MoveAndSlide();
 	}
+
+	private void HandlePlayerMovement()
+	{
+		if (isMovingTile || cameraRig == null || !cameraRig.IsLocked)
+			return;
+
+		string pressedKey = null;
+		if (Input.IsActionPressed("Walk_Front")) pressedKey = "Walk_Front";
+		else if (Input.IsActionPressed("Walk_Back")) pressedKey = "Walk_Back";
+		else if (Input.IsActionPressed("Walk_Left")) pressedKey = "Walk_Left";
+		else if (Input.IsActionPressed("Walk_Right")) pressedKey = "Walk_Right";
+
+		if (pressedKey == null)
+	return;
+
+		// Aplica rotação mesmo que não vá se mover ainda
+		switch (pressedKey)
+		{
+			case "Walk_Front":
+				targetYaw = Mathf.DegToRad(0);
+				break;
+			case "Walk_Back":
+				targetYaw = Mathf.DegToRad(180);
+				break;
+			case "Walk_Left":
+				targetYaw = Mathf.DegToRad(-90);
+				break;
+			case "Walk_Right":
+				targetYaw = Mathf.DegToRad(90);
+				break;
+		}
+
+		// Só move se tempo pressionado for suficiente
+		if (!inputPressTime.ContainsKey(pressedKey) || inputPressTime[pressedKey] < PressThreshold)
+			return;
+
+
+		Vector3I direction = Vector3I.Zero;
+
+		switch (pressedKey)
+		{
+			case "Walk_Front":
+				direction.Z -= 1;
+				targetYaw = Mathf.DegToRad(0);
+				break;
+			case "Walk_Back":
+				direction.Z += 1;
+				targetYaw = Mathf.DegToRad(180);
+				break;
+			case "Walk_Left":
+				direction.X += 1;
+				targetYaw = Mathf.DegToRad(-90);
+				break;
+			case "Walk_Right":
+				direction.X -= 1;
+				targetYaw = Mathf.DegToRad(90);
+				break;
+		}
+
+		TentarMover(direction, pressedKey);
+	}
+
+	private void TentarMover(Vector3I input, string key)
+	{
+		Vector3I posAtual = PosicaoNaGrid;
+		Vector3I posDestino = posAtual + input;
+
+		Tile tileDestino = gridManager.GetTile(posDestino);
+		if (tileDestino == null || !gridManager.OcuparTile(posDestino, this))
+			return;
+
+		gridManager.LiberarTile(posAtual);
+		destinoGrid = posDestino;
+		destinoMundo = tileDestino.Position;
+		isMovingTile = true;
+
+		inputDirection = input;
+		currentKey = key;
+
+		inputPressTime.Remove(key);
+	}
+
 	public void AtualizarPosicaoNaGrid(Vector3I novaPosicao)
 	{
 		PosicaoNaGrid = novaPosicao;
 	}
 }
+
+

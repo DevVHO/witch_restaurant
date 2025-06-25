@@ -5,8 +5,8 @@ using Game.Enums;
 public partial class KitchenObjectSymbolMap : Node
 {
     [Export] public PackedScene FogaoScene { get; set; }
-    [Export] public PackedScene PiaScene { get; set; }
-    [Export] public PackedScene MesaScene { get; set; }
+    [Export] public PackedScene SinkScene { get; set; }
+    [Export] public PackedScene TableScene { get; set; }
     [Export] public PackedScene ChairScene { get; set; }
     [Export] public PackedScene BalcaoScena { get; set; }
     public Dictionary<char, PackedScene> CriarMapaCenas()
@@ -14,8 +14,8 @@ public partial class KitchenObjectSymbolMap : Node
         return new Dictionary<char, PackedScene>
         {
             { 'F', FogaoScene },
-            { 'P', PiaScene },
-            { 'M', MesaScene },
+            { 'S', SinkScene },
+            { 'T', TableScene },
             { 'C', ChairScene },
             { 'B', BalcaoScena}
         };
@@ -27,8 +27,8 @@ public partial class KitchenObjectSymbolMap : Node
         {
             { 'V', TileState.Livre },
             { 'F', TileState.Bloqueado },
-            { 'P', TileState.Bloqueado },
-            { 'M', TileState.Ocupado },
+            { 'S', TileState.Bloqueado },
+            { 'T', TileState.Ocupado },
             { 'C', TileState.Bloqueado },
             { 'B', TileState.Bloqueado}
         };

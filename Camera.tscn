@@ -39,7 +39,7 @@ transform = Transform3D(4.19047, 0, 0, 0, 0.543502, 0, 0, 0, 4.19047, 0, -0.2399
 [node name="StaticBody3D" type="StaticBody3D" parent="Environment/Place"]
 
 [node name="Mesh" type="MeshInstance3D" parent="Environment/Place/StaticBody3D"]
-transform = Transform3D(1.84088, -0.000727921, 0.000745969, 0.00132753, 1.00907, 0.000326951, -0.00136053, -0.000326222, 1.00966, 0, 0.262053, 0)
+transform = Transform3D(1.84088, -0.000727921, 0.000745969, 0.00132753, 1.00907, 0.000326951, -0.00136053, -0.000326222, 1.00966, 0, -0.508418, 0)
 material_override = ExtResource("1_cr4wk")
 mesh = SubResource("BoxMesh_2miw8")
 skeleton = NodePath("../../../..")
@@ -63,8 +63,8 @@ shape = SubResource("BoxShape3D_8yu0k")
 [node name="KitchenObjectMap" type="Node3D" parent="."]
 script = ExtResource("3_gmjel")
 FogaoScene = ExtResource("3_8yu0k")
-PiaScene = ExtResource("4_tim8x")
-MesaScene = ExtResource("5_8pq3l")
+SinkScene = ExtResource("4_tim8x")
+TableScene = ExtResource("5_8pq3l")
 ChairScene = ExtResource("6_6usox")
 BalcaoScena = ExtResource("7_8yu0k")
 

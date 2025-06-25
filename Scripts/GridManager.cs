@@ -119,18 +119,18 @@ public partial class GridManager : Node3D
     private string[] layoutMapa = new string[]
     {
         "VVVVVVVVVVVVVVV",
+        "VVVVVVVVVCTCVVV",
+        "VCTCVVVVVVVVVVV",
+        "VVVVVVVVVCTCVVV",
         "VVVVVVVVVVVVVVV",
         "VVVVVVVVVVVVVVV",
-        "VVVVVVVVVVVVVVV",
-        "VVVVVVVVVVVVVVV",
-        "VVVVVVVVVVVVVVV",
-        "VVVVVVVVVVVVVVV",
+        "VVCTCVVVVVCTCVV",
         "VVVVVVVVVVVVVVV",
         "BBBBBVVVVVVVVVV",
         "VVVVVVVVVVVVVVV",
         "VVVVBVVVVVVVVVV",
         "VVVVBVVVVVVVVVV",
-        "BBBBBVVVVVVVVVV",
+        "BBBBBVVVVVCTCVV",
         "VVVVVVVVVVVVVVV",
         "VVVVVVVVVVVVVVV"
     };
@@ -196,13 +196,16 @@ public partial class GridManager : Node3D
         }
 
         var jogadorRaw = JogadorScene.Instantiate();
-        if (jogadorRaw is not CharacterBody3D jogador)
+
+        if (jogadorRaw is not PlayerControl jogador)
         {
-            GD.PrintErr("O jogador instanciado não é um CharacterBody3D!");
+            GD.PrintErr("Jogador instanciado não é PlayerControl!");
             return;
         }
 
         jogador.Position = tile.Position;
+        jogador.PosicaoNaGrid = gridPos;
+        OcuparTile(gridPos, jogador);
         AddChild(jogador);
 
         var target = GetTree().Root.FindChild("Target_Player2", true, false) as Node3D;
@@ -212,21 +215,18 @@ public partial class GridManager : Node3D
             return;
         }
 
-        // Verificações defensivas
         if (!IsInstanceValid(target))
         {
             GD.PrintErr("Target_Player2 não é válido.");
             return;
         }
 
-        // Salva os dados para o deferred
         _targetToReparent = target;
         _jogadorToParent = jogador;
 
         CallDeferred(nameof(ReparentTarget));
-
-        tile.Estado = TileState.Ocupado;
     }
+
 
     // Campos privados para segurar referências temporárias
     private Node3D _targetToReparent;
@@ -253,6 +253,12 @@ public partial class GridManager : Node3D
         _jogadorToParent = null;
     }
 
-    //Interface
+    public Vector3I WorldToGrid(Vector3 worldPos)
+    {
+        int x = Mathf.RoundToInt(worldPos.X / TILE_SIZE);
+        int y = 0; // se sua grid é 2D no plano XZ, Y fica zero
+        int z = Mathf.RoundToInt(worldPos.Z / TILE_SIZE);
+        return new Vector3I(x, y, z);
+    }
     
 }
