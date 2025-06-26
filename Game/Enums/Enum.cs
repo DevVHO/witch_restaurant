@@ -1,11 +1,11 @@
-
-namespace Witch_Restaurant.Scripts
+namespace Game.Enums
 {
     public enum TileState
     {
         Livre,
         Ocupado,
-        Bloqueado
+        Bloqueado,
+        Interagindo
     }
 
 }

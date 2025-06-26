@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://bl1rc47irptjd"]
 
-[ext_resource type="Script" uid="uid://dttyvj54h5187" path="res://Scripts/Prefabs/Pia.cs" id="1_qg62g"]
+[ext_resource type="Script" uid="uid://dttyvj54h5187" path="res://Scripts/Prefabs/Environment/Pia.cs" id="1_qg62g"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_ql736"]
 

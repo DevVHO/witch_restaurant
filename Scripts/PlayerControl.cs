@@ -15,6 +15,8 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 
 	private CameraRig cameraRig;
 	private GridManager gridManager;
+	private Node3D itemNaMao;
+	private Node3D handPoint;
 	private bool isMovingTile = false;
 
 	private Vector3 destinoMundo;
@@ -23,8 +25,13 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 
 	private Dictionary<string, float> inputPressTime = new();
 	private string currentKey = null;
+	public Vector3I Direcao { get; set; } = Vector3I.Right;
 	private Vector3I inputDirection = Vector3I.Zero;
-
+	//Interação -parte visual
+	private Tile tileInteragido = null;
+	private Color corOriginalTile;
+	private bool interactPressedLastFrame = false;
+	private TileState estadoAnteriorTile;
 	public override void _Ready()
 	{
 		cameraRig = GetTree().Root.FindChild("Camera_Position", true, false) as CameraRig;
@@ -33,6 +40,41 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 
 	public override void _PhysicsProcess(double delta)
 	{
+		// Lida com cor do tile enquanto Interact estiver pressionado
+		bool interactPressed = Input.IsActionPressed("Interact");
+
+		if (interactPressed)
+		{
+			Vector3I posFrente = PosicaoNaGrid + Direcao;
+			Tile tileAlvo = gridManager.GetTile(posFrente);
+			if (tileAlvo != null)
+			{
+				if (tileInteragido != tileAlvo)
+				{
+					// Restaurar estado do tile anterior
+					if (tileInteragido != null)
+						tileInteragido.Estado = estadoAnteriorTile;
+
+					tileInteragido = tileAlvo;
+					estadoAnteriorTile = tileAlvo.Estado;  // salva estado atual
+					tileAlvo.Estado = TileState.Interagindo; // muda para interagindo
+				}
+			}
+		}
+		else
+		{
+			if (tileInteragido != null)
+			{
+				// Quando soltar, restaura o estado anterior
+				tileInteragido.Estado = estadoAnteriorTile;
+				tileInteragido = null;
+			}
+		}
+
+
+		interactPressedLastFrame = interactPressed;
+
+
 		// Se estiver em movimento, permitir que termine mesmo com câmera destravada
 		if (isMovingTile)
 		{
@@ -50,6 +92,11 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 			}
 			return;
 		}
+		if (Input.IsActionJustPressed("Interact"))
+		{
+			Interact();
+		}
+
 
 		// Não faz mais nada se a câmera estiver destravada e não estamos movendo
 		if (cameraRig == null || !cameraRig.IsLocked)
@@ -68,7 +115,7 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 
 		HandlePlayerMovement();
 	}
-
+	public bool MaoVazia() => itemNaMao == null;
 
 	private void UpdateInputTimers()
 	{
@@ -94,6 +141,7 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 		if (isMovingTile || cameraRig == null || !cameraRig.IsLocked)
 			return;
 
+		// Verifica qual tecla foi pressionada
 		string pressedKey = null;
 		if (Input.IsActionPressed("Walk_Front")) pressedKey = "Walk_Front";
 		else if (Input.IsActionPressed("Walk_Back")) pressedKey = "Walk_Back";
@@ -101,54 +149,41 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 		else if (Input.IsActionPressed("Walk_Right")) pressedKey = "Walk_Right";
 
 		if (pressedKey == null)
-	return;
+			return;
 
-		// Aplica rotação mesmo que não vá se mover ainda
+		// Define a direção e a rotação alvo com base na tecla
+		Vector3I direction = Vector3I.Zero;
 		switch (pressedKey)
 		{
 			case "Walk_Front":
+				direction = Vector3I.Forward; // ou new Vector3I(0, 0, -1);
 				targetYaw = Mathf.DegToRad(0);
 				break;
 			case "Walk_Back":
+				direction = Vector3I.Back; // ou new Vector3I(0, 0, 1);
 				targetYaw = Mathf.DegToRad(180);
 				break;
 			case "Walk_Left":
+				direction = Vector3I.Right; // pois o grid está invertido horizontalmente
 				targetYaw = Mathf.DegToRad(-90);
 				break;
 			case "Walk_Right":
+				direction = Vector3I.Left; // idem
 				targetYaw = Mathf.DegToRad(90);
 				break;
 		}
+
+		// Atualiza a direção do jogador
+		Direcao = direction;
 
 		// Só move se tempo pressionado for suficiente
 		if (!inputPressTime.ContainsKey(pressedKey) || inputPressTime[pressedKey] < PressThreshold)
 			return;
 
-
-		Vector3I direction = Vector3I.Zero;
-
-		switch (pressedKey)
-		{
-			case "Walk_Front":
-				direction.Z -= 1;
-				targetYaw = Mathf.DegToRad(0);
-				break;
-			case "Walk_Back":
-				direction.Z += 1;
-				targetYaw = Mathf.DegToRad(180);
-				break;
-			case "Walk_Left":
-				direction.X += 1;
-				targetYaw = Mathf.DegToRad(-90);
-				break;
-			case "Walk_Right":
-				direction.X -= 1;
-				targetYaw = Mathf.DegToRad(90);
-				break;
-		}
-
+		// Tenta mover na direção
 		TentarMover(direction, pressedKey);
 	}
+
 
 	private void TentarMover(Vector3I input, string key)
 	{
@@ -169,11 +204,210 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 
 		inputPressTime.Remove(key);
 	}
+	private void Interact()
+	{
+		Vector3I posFrente = PosicaoNaGrid + Direcao;
 
+		Tile tileAlvo = gridManager.GetTile(posFrente);
+		if (tileAlvo == null)
+		{
+			GD.Print("Nenhum tile na frente.");
+			return;
+		}
+
+		if (tileAlvo.Ocupante is Balcao)
+		{
+			GD.Print("Tile à frente é um balcão.");
+			SoltarItemEmBalcao(gridManager);
+			return;
+		}
+
+		if (tileAlvo.Ocupante is IInteragivel interagivel)
+		{
+			GD.Print("Tile à frente é interagível.");
+			interagivel.Interact(this);
+			return;
+		}
+
+		GD.Print("Tile à frente não tem nada interagível.");
+	}
+
+
+	public void ReceberItem(Node3D item)
+	{
+		if (itemNaMao != null)
+		{
+			GD.Print("Já há um item na mão.");
+			return;
+		}
+
+		// Garante que o ponto de ancoragem foi encontrado
+		if (handPoint == null)
+			handPoint = GetNodeOrNull<Node3D>("HandPoint");
+
+		if (handPoint == null)
+		{
+			GD.PrintErr("HandPoint não encontrado no jogador.");
+			return;
+		}
+
+		handPoint.AddChild(item);
+
+		// Zera a transformação local do item (em relação ao HandPoint)
+		item.Position = Vector3.Zero;
+		item.Rotation = Vector3.Zero;
+		item.Scale = Vector3.One;
+
+		itemNaMao = item;
+	}
+
+	public void TentarInteragir()
+	{
+		Vector3I posFrente = PosicaoNaGrid + Direcao;
+		var tile = gridManager.GetTile(posFrente);
+
+		if (tile == null)
+		{
+			GD.Print("Não existe tile na frente.");
+			return;
+		}
+
+		if (tile.Estado == TileState.Ocupado || tile.Estado == TileState.Interagindo)
+		{
+			KitchenObject objParaInteragir = gridManager.GetKitchenObjectNaPos(posFrente);
+			if (objParaInteragir != null)
+			{
+				GD.Print("Interagindo com " + objParaInteragir.Name);
+				if (objParaInteragir is IInteragivel interagivel)
+				{
+					interagivel.Interact(this);
+				}
+				else
+				{
+					GD.Print("Objeto não implementa IInteragivel.");
+				}
+			}
+			else
+			{
+				GD.Print("Nenhum objeto para interagir no tile.");
+			}
+		}
+		else
+		{
+			GD.Print("Tile não ocupado, nada para interagir.");
+		}
+	}
+
+	public void DropItem()
+	{
+		if (itemNaMao == null) return;
+
+		itemNaMao.GetParent().RemoveChild(itemNaMao);
+		itemNaMao = null;
+	}
+	public Node3D GetOcupanteNaFrente()
+	{
+		Vector3I posFrente = PosicaoNaGrid + Direcao;
+		Tile tile = gridManager.GetTile(posFrente);
+		return tile?.Ocupante as Node3D;
+	}
+	public Node3D EntregarItem()
+	{
+		if (itemNaMao == null) return null;
+
+		var item = itemNaMao;
+		itemNaMao = null;
+
+		// Remove o item da mão (desvincula do handPoint)
+		item.GetParent()?.RemoveChild(item);
+
+		return item;
+	}
+
+
+	public void SoltarItemEmBalcao(GridManager gridManager)
+	{
+		if (itemNaMao == null)
+		{
+			GD.Print("Nenhum item para soltar.");
+			return;
+		}
+
+		Vector3I posFrente = PosicaoNaGrid + Direcao;
+		GD.Print($"Tentando soltar item no tile à frente: {posFrente}");
+
+		Tile tileAlvo = gridManager.GetTile(posFrente);
+		if (tileAlvo == null)
+		{
+			GD.Print("Nenhum tile à frente.");
+			return;
+		}
+
+		if (tileAlvo.Ocupante is Balcao balcao)
+		{
+			GD.Print("Tile à frente é um balcão.");
+
+			if (balcao.PossuiItem())
+			{
+				GD.Print("O balcão já possui um item.");
+				return;
+			}
+
+			GD.Print("Entregando item ao balcão...");
+			balcao.ReceberItem(itemNaMao);
+			itemNaMao = null;
+		}
+		else
+		{
+			GD.Print("O tile à frente não é um balcão.");
+		}
+	}
+	public bool PossuiItem()
+	{
+		return itemNaMao != null;
+	}
 	public void AtualizarPosicaoNaGrid(Vector3I novaPosicao)
 	{
 		PosicaoNaGrid = novaPosicao;
 	}
+	private Material originalMaterial = null;
+
+	private void GuardarCorOriginalETornarMaterial(Tile tile)
+	{
+		if (tile == null) return;
+
+		// Supondo que o Tile tem um MeshInstance3D chamado "Visual"
+		var mesh = tile.GetNodeOrNull<MeshInstance3D>("Visual");
+		if (mesh != null)
+		{
+			originalMaterial = mesh.GetActiveMaterial(0);
+		}
+	}
+
+	private void PintarTileDeVerde(Tile tile)
+	{
+		if (tile == null) return;
+
+		var mesh = tile.GetNodeOrNull<MeshInstance3D>("Visual");
+		if (mesh != null)
+		{
+			var mat = new StandardMaterial3D();
+			mat.AlbedoColor = new Color(0, 1, 0); // Verde
+			mesh.SetSurfaceOverrideMaterial(0, mat);
+		}
+	}
+
+	private void RestaurarCorTile(Tile tile)
+	{
+		if (tile == null) return;
+
+		var mesh = tile.GetNodeOrNull<MeshInstance3D>("Visual");
+		if (mesh != null && originalMaterial != null)
+		{
+			mesh.SetSurfaceOverrideMaterial(0, originalMaterial);
+		}
+	}
+
 }
 
 

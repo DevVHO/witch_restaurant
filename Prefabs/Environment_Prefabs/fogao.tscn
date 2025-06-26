@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://1yuwjd818iuj"]
 
-[ext_resource type="Script" uid="uid://kke1gskjsqup" path="res://Scripts/Prefabs/Fogao.cs" id="1_2r867"]
+[ext_resource type="Script" uid="uid://kke1gskjsqup" path="res://Scripts/Prefabs/Environment/Fogao.cs" id="1_2r867"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_5gvj5"]
 

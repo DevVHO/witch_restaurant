@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dlpniyho3no8y"]
 
-[ext_resource type="Script" uid="uid://cjp2jww88hr3r" path="res://Scripts/Prefabs/Table.cs" id="1_aao80"]
+[ext_resource type="Script" uid="uid://cjp2jww88hr3r" path="res://Scripts/Prefabs/Environment/Table.cs" id="1_aao80"]
 [ext_resource type="ArrayMesh" uid="uid://cropbha2r2fi" path="res://Models/Assets/Objetos/Table_Update.obj" id="2_aao80"]
 
 [node name="Table" type="Node3D"]

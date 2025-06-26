@@ -9,6 +9,7 @@ public partial class KitchenObjectSymbolMap : Node
     [Export] public PackedScene TableScene { get; set; }
     [Export] public PackedScene ChairScene { get; set; }
     [Export] public PackedScene BalcaoScena { get; set; }
+    [Export] public PackedScene SumoScena { get; set; }
     public Dictionary<char, PackedScene> CriarMapaCenas()
     {
         return new Dictionary<char, PackedScene>
@@ -17,7 +18,8 @@ public partial class KitchenObjectSymbolMap : Node
             { 'S', SinkScene },
             { 'T', TableScene },
             { 'C', ChairScene },
-            { 'B', BalcaoScena}
+            { 'B', BalcaoScena},
+            { 'O', SumoScena }
         };
     }
 
@@ -30,7 +32,8 @@ public partial class KitchenObjectSymbolMap : Node
             { 'S', TileState.Bloqueado },
             { 'T', TileState.Ocupado },
             { 'C', TileState.Bloqueado },
-            { 'B', TileState.Bloqueado}
+            { 'O', TileState.Bloqueado },
+            { 'B', TileState.Ocupado}
         };
     }
 }

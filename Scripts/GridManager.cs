@@ -48,7 +48,7 @@ public partial class GridManager : Node3D
     {
         grid.Clear();
 
-        // Tile temporário para obter tamanho
+        // Tile temporário para obter tamanho real
         Tile tileTemp = TileScene.Instantiate<Tile>();
         AddChild(tileTemp);
         Aabb bounds = tileTemp.GetChild<MeshInstance3D>(0).GetAabb();
@@ -66,11 +66,12 @@ public partial class GridManager : Node3D
                 Vector3I gridPos = new Vector3I(x, 0, z);
                 Vector3 worldPos = new Vector3(x * tileSize.X, 0, z * tileSize.Z);
 
+                // Criação do tile
                 Tile tile = TileScene.Instantiate<Tile>();
                 tile.Position = worldPos;
                 tile.Posicao = gridPos;
 
-                // Tiles de chão simples
+                // Caso seja tile vazio
                 if (simbolo == 'V')
                 {
                     tile.Estado = TileState.Livre;
@@ -79,16 +80,22 @@ public partial class GridManager : Node3D
                     continue;
                 }
 
-                // Tiles com KitchenObject
+                // Verifica se há KitchenObject associado ao símbolo
                 if (mapaKitchenObjects.TryGetValue(simbolo, out var cena) && cena != null)
                 {
                     var instance = cena.Instantiate();
 
                     if (instance is KitchenObject obj)
                     {
-                        AddChild(obj); // Primeiro adiciona à árvore de nós (importante!)
+                        AddChild(obj); // Adiciona KitchenObject à árvore
                         obj.Position = worldPos;
                         obj.AplicarRotacao(rotacao);
+
+                        // Caso seja um Balcao, configura a Bandeja
+                        if (obj is Balcao balcao)
+                        {
+                            balcao.ConfigurarBandeja();
+                        }
 
                         // Estado do tile baseado no símbolo
                         tile.Estado = mapaEstadosTile.TryGetValue(simbolo, out var estado)
@@ -97,29 +104,20 @@ public partial class GridManager : Node3D
 
                         AddChild(tile);
                         grid[gridPos] = tile;
-
-                        // Ocupar tile com o objeto/ Se o professor não vê, o coração não sente
-                        
-                        /* if (!OcuparTile(gridPos, obj))
-                        {
-                            GD.PrintErr($"Erro ao ocupar tile {gridPos} com objeto '{simbolo}'");
-                        }
-                        */
                     }
                     else
                     {
                         GD.PrintErr($"Instância de símbolo '{simbolo}' NÃO É KitchenObject! Tipo: {instance.GetType()}");
-                        continue;
                     }
                 }
                 else
                 {
                     GD.PrintErr($"Símbolo inválido ou cena não encontrada: '{simbolo}'");
-                    continue;
                 }
             }
         }
     }
+
     private string[,] layoutMapa = new string[,]
     {
     { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
@@ -132,11 +130,11 @@ public partial class GridManager : Node3D
     { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
     { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
     { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
-    { "0B", "0B", "0B", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "1B", "0O", "1B", "1B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
     { "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
     { "0B", "VV", "VV", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
     { "0B", "VV", "VV", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
-    { "0B", "0B", "0B", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "1B", "1B", "1B", "1B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
     };
     //Todos os objetos se incializa olhando para a Direita --->>
     //A cada 1 que eu colocar na frente no character especial é igual +90º
@@ -265,5 +263,19 @@ public partial class GridManager : Node3D
         int z = Mathf.RoundToInt(worldPos.Z / TILE_SIZE);
         return new Vector3I(x, y, z);
     }
+    public KitchenObject GetKitchenObjectNaPos(Vector3I gridPos)
+    {
+        foreach (Node child in GetChildren())
+        {
+            if (child is KitchenObject obj)
+            {
+                Vector3I posObj = WorldToGrid(obj.GlobalPosition);
+                if (posObj == gridPos)
+                    return obj;
+            }
+        }
+        return null;
+    }
+
     
 }

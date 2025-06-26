@@ -58,6 +58,9 @@ public partial class Tile : Node3D
             case TileState.Bloqueado:
                 cor = new Color(0.8f, 0.1f, 0.1f); // vermelho escuro
                 break;
+            case TileState.Interagindo:
+                cor = new Color(0, 1, 0); // verde
+                break;
         }
 
         material.SetShaderParameter("base_color", cor);

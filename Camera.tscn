@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://ciw5dmgaqravq"]
+[gd_scene load_steps=16 format=3 uid="uid://ciw5dmgaqravq"]
 
 [ext_resource type="Material" uid="uid://bjbbo2oikjjjq" path="res://Models/Materiais/Base_Material(player).tres" id="1_cr4wk"]
 [ext_resource type="PackedScene" uid="uid://1yuwjd818iuj" path="res://Prefabs/Environment_Prefabs/fogao.tscn" id="3_8yu0k"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://dlpniyho3no8y" path="res://Prefabs/Environment_Prefabs/Table.tscn" id="5_8pq3l"]
 [ext_resource type="PackedScene" uid="uid://ds3112n2vvdr2" path="res://Prefabs/Environment_Prefabs/Chair.tscn" id="6_6usox"]
 [ext_resource type="PackedScene" uid="uid://dwo7hio4pl0s6" path="res://Prefabs/Environment_Prefabs/Balcao.tscn" id="7_8yu0k"]
+[ext_resource type="PackedScene" uid="uid://vpsrkrvdcm3r" path="res://Prefabs/Environment_Prefabs/maquina_sumo.tscn" id="8_tim8x"]
 [ext_resource type="Script" uid="uid://b0jbij532pcxt" path="res://Scripts/GridManager.cs" id="9_4656x"]
 [ext_resource type="Script" uid="uid://cduux8tcw1er4" path="res://Scripts/CameraRig.cs" id="9_gmjel"]
 [ext_resource type="PackedScene" uid="uid://meyji33pyy2y" path="res://Prefabs/Tiles/Tile.tscn" id="10_gmjel"]
@@ -25,7 +26,7 @@ points = PackedVector3Array(-2.46, -0.02, -2.365, -2.46, 0.02, -2.365, 2.46, -0.
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.774506, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.899997, -0.274852, -0.338323, 0.00767373, -0.786024, 0.618148, -0.435829, 0.553735, 0.709528, -7.39471, 5.53545, 7.42431)
+transform = Transform3D(-0.899997, -0.274852, -0.338323, -0.325332, -0.0930266, 0.941013, -0.290112, 0.956976, -0.00569424, -7.39471, 17.7776, 7.42431)
 light_energy = 3.0
 
 [node name="Environment" type="Node3D" parent="."]
@@ -56,6 +57,7 @@ SinkScene = ExtResource("4_tim8x")
 TableScene = ExtResource("5_8pq3l")
 ChairScene = ExtResource("6_6usox")
 BalcaoScena = ExtResource("7_8yu0k")
+SumoScena = ExtResource("8_tim8x")
 
 [node name="GridManager" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.46837, 0.265399, -6.75736)
