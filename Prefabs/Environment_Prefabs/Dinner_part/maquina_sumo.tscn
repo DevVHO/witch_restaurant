@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://vpsrkrvdcm3r"]
+
+[ext_resource type="Script" uid="uid://b7jme1t853u4y" path="res://Scripts/Prefabs/Environment/Maquina_Sumo.cs" id="1_bt2ah"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_8yu0k"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tim8x"]
+albedo_color = Color(0.27765, 0.272025, 0.276325, 1)
+
+[node name="Maquina_Sumo" type="Node3D" node_paths=PackedStringArray("Slots")]
+script = ExtResource("1_bt2ah")
+Slots = [NodePath("Point_Sumo"), NodePath("Point_Sumo2")]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.964, 0, 0, 0, 1.154, 0, 0, 0, 0.85, 0, 0, -0.121782)
+mesh = SubResource("BoxMesh_8yu0k")
+surface_material_override/0 = SubResource("StandardMaterial3D_tim8x")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.283509, 0, 0, 0, 0.304919, 0.00529027, -0.0437026, 0.466359)
+mesh = SubResource("BoxMesh_8yu0k")
+surface_material_override/0 = SubResource("StandardMaterial3D_tim8x")
+
+[node name="Point_Sumo" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.297341, 0.135095, 0.441437)
+
+[node name="Point_Sumo2" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.21608, 0.148054, 0.452477)

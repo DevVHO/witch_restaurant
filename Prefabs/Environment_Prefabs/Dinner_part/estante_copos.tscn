@@ -1,0 +1,36 @@
+[gd_scene load_steps=5 format=3 uid="uid://b1x8io06j6t1m"]
+
+[ext_resource type="Script" uid="uid://bl8txj1ax61uf" path="res://Scripts/Prefabs/Environment/EstanteCopos.cs" id="1_pf5l6"]
+[ext_resource type="PackedScene" uid="uid://cbwnm2xmqkty8" path="res://Prefabs/Itens/Copo.tscn" id="2_51f6w"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_jr2gg"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5bwh7"]
+albedo_color = Color(0.21607, 0.129801, 0.0329989, 1)
+
+[node name="Estante_Copos" type="Node3D" node_paths=PackedStringArray("Slots")]
+script = ExtResource("1_pf5l6")
+CopoScene = ExtResource("2_51f6w")
+Slots = [NodePath("Slot_Copo1"), NodePath("Slot_Copo2"), NodePath("Slot_Copo3"), NodePath("Slot_Copo4"), NodePath("Slot_Copo5"), NodePath("Slot_Copo6")]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_jr2gg")
+surface_material_override/0 = SubResource("StandardMaterial3D_5bwh7")
+
+[node name="Slot_Copo1" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20047, 0.573661, -0.234269)
+
+[node name="Slot_Copo2" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20047, 0.573661, 0.0037287)
+
+[node name="Slot_Copo3" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.20047, 0.573661, 0.240182)
+
+[node name="Slot_Copo4" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.204847, 0.573661, 0.240182)
+
+[node name="Slot_Copo5" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.204847, 0.573661, -0.00973557)
+
+[node name="Slot_Copo6" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.204847, 0.573661, -0.249951)

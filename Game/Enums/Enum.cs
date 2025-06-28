@@ -7,5 +7,12 @@ namespace Game.Enums
         Bloqueado,
         Interagindo
     }
+    public enum CopoState
+    {
+        Vazio,
+        SucoLaranja,
+        SucoLaranjaComGelo,
+        SucoLaranjaComLimao
+    }   
 
 }

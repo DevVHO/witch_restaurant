@@ -1,6 +1,6 @@
 using Godot;
-using System;
 
-public partial class Item : Node
+public partial class Item : Node3D
 {
+
 }

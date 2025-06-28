@@ -17,9 +17,6 @@ public partial class GridManager : Node3D
     private Dictionary<Vector3I, Tile> grid = new();
     private Dictionary<char, TileState> mapaEstadosTile;
 
-
-    private const int GRID_WIDTH = 15;
-    private const int GRID_HEIGHT = 15;
     private const float TILE_SIZE = 1.0f; // Ajuste conforme a escala do seu mesh
 
     public override void _Ready()
@@ -27,9 +24,7 @@ public partial class GridManager : Node3D
         symbolMap = GetNode<KitchenObjectSymbolMap>(SymbolMapNodePath);
         mapaKitchenObjects = symbolMap.CriarMapaCenas();
         mapaEstadosTile = symbolMap.CriarMapaEstados();
-        GenerateGrid();
-        Vector3I posicaoInicial = new Vector3I(6, 0, 14);
-        InstanciarJogadorNaGrid(posicaoInicial);
+        
     }
     private (char simbolo, int rotacaoGraus) InterpretarToken(string token)
     {
@@ -97,11 +92,19 @@ public partial class GridManager : Node3D
                             balcao.ConfigurarBandeja();
                         }
 
-                        // Estado do tile baseado no símbolo
-                        tile.Estado = mapaEstadosTile.TryGetValue(simbolo, out var estado)
-                            ? estado
-                            : TileState.Bloqueado;
+                                                // Estado do tile baseado no símbolo
+                        // Decide o estado com base no símbolo
+                        TileState estado = mapaEstadosTile.TryGetValue(simbolo, out var e) ? e : TileState.Bloqueado;
+                        tile.Estado = estado;
 
+                        // Se o tile for "ocupado" e o objeto pode ocupar (ou é Balcao por exemplo)
+                        if (estado == TileState.Ocupado && obj is IOcupanteTile ocupante)
+                        {
+                            tile.Ocupante = ocupante;
+                            ocupante.PosicaoNaGrid = gridPos;
+                        }
+
+                        // Registra tile
                         AddChild(tile);
                         grid[gridPos] = tile;
                     }
@@ -130,11 +133,11 @@ public partial class GridManager : Node3D
     { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
     { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
     { "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
-    { "1B", "0O", "1B", "1B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
-    { "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
-    { "0B", "VV", "VV", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
-    { "0B", "VV", "VV", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
-    { "1B", "1B", "1B", "1B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "3K", "0O", "1K", "1K", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "0E", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "0E", "VV", "VV", "0B", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "0B", "VV", "VV", "0K", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
+    { "0K", "1B", "1K", "2K", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV", "VV" },
     };
     //Todos os objetos se incializa olhando para a Direita --->>
     //A cada 1 que eu colocar na frente no character especial é igual +90º
@@ -143,27 +146,6 @@ public partial class GridManager : Node3D
     public Tile GetTile(Vector3I pos)
     {
         return grid.TryGetValue(pos, out var tile) ? tile : null;
-    }
-
-    public List<Tile> GetVizinhos(Vector3I pos)
-    {
-        List<Tile> vizinhos = new();
-        Vector3I[] direcoes = new Vector3I[]
-        {
-            new Vector3I(1, 0, 0),
-            new Vector3I(-1, 0, 0),
-            new Vector3I(0, 0, 1),
-            new Vector3I(0, 0, -1)
-        };
-
-        foreach (Vector3I dir in direcoes)
-        {
-            Vector3I vizinhoPos = pos + dir;
-            if (grid.ContainsKey(vizinhoPos))
-                vizinhos.Add(grid[vizinhoPos]);
-        }
-
-        return vizinhos;
     }
 
     public bool OcuparTile(Vector3I pos, IOcupanteTile ocupante)

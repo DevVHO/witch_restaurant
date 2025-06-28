@@ -25,6 +25,10 @@ window/size/mode=2
 
 project/assembly_name="Witch_Restaurant"
 
+[editor]
+
+version_control/autoload_on_startup=true
+
 [input]
 
 Walk_Front={

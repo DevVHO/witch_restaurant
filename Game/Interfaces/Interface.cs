@@ -7,7 +7,7 @@ namespace Game.Interfaces
     {
         Vector3I PosicaoNaGrid { get; set; }
     }
-        public interface IInteragivel
+    public interface IInteragivel
     {
         void Interact(PlayerControl player);
     }

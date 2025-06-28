@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3 uid="uid://dwo7hio4pl0s6"]
+
+[ext_resource type="Script" uid="uid://civ4iwtsw7eih" path="res://Scripts/Prefabs/Environment/Balcao.cs" id="1_pvgn1"]
+[ext_resource type="PackedScene" uid="uid://dla68hsvqfacy" path="res://Prefabs/Itens/bandeja.tscn" id="2_yfnrf"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ey161"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pvgn1"]
+albedo_color = Color(0.16077, 0.044173, 0.00226781, 1)
+
+[node name="Balcão" type="Node3D" groups=["Balcao"]]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 0.85, 0, 0, 0)
+script = ExtResource("1_pvgn1")
+BandejaScene = ExtResource("2_yfnrf")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_ey161")
+surface_material_override/0 = SubResource("StandardMaterial3D_pvgn1")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.125805, 0.511163, -0.0045154)

@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://m43n2vo1yafo"]
+
+[ext_resource type="Script" uid="uid://d3i1ttbr5yju2" path="res://Scripts/Prefabs/Environment/Balcaok.cs" id="1_dnqhw"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ey161"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pvgn1"]
+albedo_color = Color(0.16077, 0.044173, 0.00226781, 1)
+
+[node name="Balcãok" type="Node3D"]
+transform = Transform3D(0.85, 0, 0, 0, 0.85, 0, 0, 0, 0.85, 0, 0, 0)
+script = ExtResource("1_dnqhw")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_ey161")
+surface_material_override/0 = SubResource("StandardMaterial3D_pvgn1")
+
+[node name="SpawnPoint" type="Marker3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.125805, 0.511163, -0.0045154)

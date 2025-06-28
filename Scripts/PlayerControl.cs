@@ -8,27 +8,30 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 {
 	public Vector3I PosicaoNaGrid { get; set; }
 
+	//Elementos de efeito de animação
 	[Export] public float Speed = 6.0f; // tiles/segundo
 	[Export] public float Gravity = 9.8f;
 	[Export] public float RotationSpeed = 30.0f;
 	[Export] public float PressThreshold = 0.13f;
-
+	private float targetYaw;
+	private string currentKey = null;
+	private Dictionary<string, float> inputPressTime = new();
+	//Outras classes
 	private CameraRig cameraRig;
 	private GridManager gridManager;
-	private Node3D itemNaMao;
-	private Node3D handPoint;
-	private bool isMovingTile = false;
+	//Interacts
+	public Item itemNaMao;
+	public Node3D handPoint;
+	private Tile tileInteragido = null;
 
+	//Condições de Movimentação
+	private bool isMovingTile = false;
+	public Vector3I Direcao { get; set; } = Vector3I.Forward;
+	private Vector3I inputDirection = Vector3I.Zero;
+	//Comunicação para movimentar
 	private Vector3 destinoMundo;
 	private Vector3I destinoGrid;
-	private float targetYaw = 0f;
-
-	private Dictionary<string, float> inputPressTime = new();
-	private string currentKey = null;
-	public Vector3I Direcao { get; set; } = Vector3I.Right;
-	private Vector3I inputDirection = Vector3I.Zero;
 	//Interação -parte visual
-	private Tile tileInteragido = null;
 	private Color corOriginalTile;
 	private bool interactPressedLastFrame = false;
 	private TileState estadoAnteriorTile;
@@ -92,7 +95,7 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 			}
 			return;
 		}
-		if (Input.IsActionJustPressed("Interact"))
+		if (Input.IsActionJustReleased("Interact"))
 		{
 			Interact();
 		}
@@ -115,7 +118,7 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 
 		HandlePlayerMovement();
 	}
-	public bool MaoVazia() => itemNaMao == null;
+
 
 	private void UpdateInputTimers()
 	{
@@ -204,164 +207,112 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 
 		inputPressTime.Remove(key);
 	}
+	#region Interação
+	public bool MaoVazia() => itemNaMao == null;
+	public Item ItemNaMao
+	{
+		get => itemNaMao;
+		set => itemNaMao = value;
+	}
 	private void Interact()
 	{
 		Vector3I posFrente = PosicaoNaGrid + Direcao;
-
 		Tile tileAlvo = gridManager.GetTile(posFrente);
-		if (tileAlvo == null)
+
+		if (tileAlvo.Ocupante is Balcao balcao)
 		{
-			GD.Print("Nenhum tile na frente.");
+			// Buscar bandeja dentro do balcão
+			Bandeja bandeja = balcao.ObterBandejaNoBalcao();
+			if (bandeja != null && itemNaMao is Copo copo)
+			{
+				if (bandeja.AdicionarItem(copo))
+				{
+					itemNaMao = null;
+					GD.Print("Copo colocado na bandeja via balcão.");
+					return;
+				}
+			}
+
+			// Caso não tenha bandeja ou não colocou o copo, tenta a lógica do balcão normal
+			if (MaoVazia() && balcao.PossuiItem())
+			{
+				var item = balcao.RetirarItem();
+				ReceberItem(item);
+				GD.Print("Item pego do balcão.");
+			}
+			else if (!MaoVazia() && !balcao.PossuiItem())
+			{
+				var item = EntregarItem();
+				balcao.ReceberItem(item);
+				GD.Print("Item colocado no balcão.");
+			}
+			else
+			{
+				GD.Print("Interação inválida com o balcão.");
+			}
 			return;
 		}
 
-		if (tileAlvo.Ocupante is Balcao)
+		var objeto = GetOcupanteNaFrente();
+		if (objeto is Bandeja bandejaFrente && itemNaMao is Copo copoMao)
 		{
-			GD.Print("Tile à frente é um balcão.");
-			SoltarItemEmBalcao(gridManager);
-			return;
+			if (bandejaFrente.AdicionarItem(copoMao))
+			{
+				itemNaMao = null;
+				return;
+			}
 		}
 
 		if (tileAlvo.Ocupante is IInteragivel interagivel)
 		{
-			GD.Print("Tile à frente é interagível.");
 			interagivel.Interact(this);
 			return;
 		}
 
-		GD.Print("Tile à frente não tem nada interagível.");
 	}
 
 
-	public void ReceberItem(Node3D item)
+
+	public void ReceberItem(Item item)
 	{
 		if (itemNaMao != null)
 		{
-			GD.Print("Já há um item na mão.");
 			return;
 		}
 
-		// Garante que o ponto de ancoragem foi encontrado
 		if (handPoint == null)
 			handPoint = GetNodeOrNull<Node3D>("HandPoint");
 
-		if (handPoint == null)
-		{
-			GD.PrintErr("HandPoint não encontrado no jogador.");
-			return;
-		}
+		// Remove de onde estiver antes de adicionar
+		if (item.GetParent() != null)
+			item.GetParent().RemoveChild(item);
 
 		handPoint.AddChild(item);
-
-		// Zera a transformação local do item (em relação ao HandPoint)
-		item.Position = Vector3.Zero;
-		item.Rotation = Vector3.Zero;
+		item.GlobalTransform = handPoint.GlobalTransform;
 		item.Scale = Vector3.One;
 
 		itemNaMao = item;
 	}
 
-	public void TentarInteragir()
-	{
-		Vector3I posFrente = PosicaoNaGrid + Direcao;
-		var tile = gridManager.GetTile(posFrente);
-
-		if (tile == null)
-		{
-			GD.Print("Não existe tile na frente.");
-			return;
-		}
-
-		if (tile.Estado == TileState.Ocupado || tile.Estado == TileState.Interagindo)
-		{
-			KitchenObject objParaInteragir = gridManager.GetKitchenObjectNaPos(posFrente);
-			if (objParaInteragir != null)
-			{
-				GD.Print("Interagindo com " + objParaInteragir.Name);
-				if (objParaInteragir is IInteragivel interagivel)
-				{
-					interagivel.Interact(this);
-				}
-				else
-				{
-					GD.Print("Objeto não implementa IInteragivel.");
-				}
-			}
-			else
-			{
-				GD.Print("Nenhum objeto para interagir no tile.");
-			}
-		}
-		else
-		{
-			GD.Print("Tile não ocupado, nada para interagir.");
-		}
-	}
-
-	public void DropItem()
-	{
-		if (itemNaMao == null) return;
-
-		itemNaMao.GetParent().RemoveChild(itemNaMao);
-		itemNaMao = null;
-	}
 	public Node3D GetOcupanteNaFrente()
 	{
 		Vector3I posFrente = PosicaoNaGrid + Direcao;
 		Tile tile = gridManager.GetTile(posFrente);
 		return tile?.Ocupante as Node3D;
 	}
-	public Node3D EntregarItem()
+	public Item EntregarItem()
 	{
 		if (itemNaMao == null) return null;
 
 		var item = itemNaMao;
 		itemNaMao = null;
 
-		// Remove o item da mão (desvincula do handPoint)
-		item.GetParent()?.RemoveChild(item);
+		if (item.GetParent() != null)
+			item.GetParent().RemoveChild(item);
 
 		return item;
 	}
 
-
-	public void SoltarItemEmBalcao(GridManager gridManager)
-	{
-		if (itemNaMao == null)
-		{
-			GD.Print("Nenhum item para soltar.");
-			return;
-		}
-
-		Vector3I posFrente = PosicaoNaGrid + Direcao;
-		GD.Print($"Tentando soltar item no tile à frente: {posFrente}");
-
-		Tile tileAlvo = gridManager.GetTile(posFrente);
-		if (tileAlvo == null)
-		{
-			GD.Print("Nenhum tile à frente.");
-			return;
-		}
-
-		if (tileAlvo.Ocupante is Balcao balcao)
-		{
-			GD.Print("Tile à frente é um balcão.");
-
-			if (balcao.PossuiItem())
-			{
-				GD.Print("O balcão já possui um item.");
-				return;
-			}
-
-			GD.Print("Entregando item ao balcão...");
-			balcao.ReceberItem(itemNaMao);
-			itemNaMao = null;
-		}
-		else
-		{
-			GD.Print("O tile à frente não é um balcão.");
-		}
-	}
 	public bool PossuiItem()
 	{
 		return itemNaMao != null;
@@ -370,6 +321,9 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 	{
 		PosicaoNaGrid = novaPosicao;
 	}
+	#endregion interação
+
+//Visualização de Interação
 	private Material originalMaterial = null;
 
 	private void GuardarCorOriginalETornarMaterial(Tile tile)
@@ -394,6 +348,7 @@ public partial class PlayerControl : CharacterBody3D, IOcupanteTile
 			var mat = new StandardMaterial3D();
 			mat.AlbedoColor = new Color(0, 1, 0); // Verde
 			mesh.SetSurfaceOverrideMaterial(0, mat);
+			GD.Print(tile.GetType());
 		}
 	}
 

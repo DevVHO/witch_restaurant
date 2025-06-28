@@ -1,18 +1,20 @@
-[gd_scene load_steps=16 format=3 uid="uid://ciw5dmgaqravq"]
+[gd_scene load_steps=18 format=3 uid="uid://ciw5dmgaqravq"]
 
 [ext_resource type="Material" uid="uid://bjbbo2oikjjjq" path="res://Models/Materiais/Base_Material(player).tres" id="1_cr4wk"]
-[ext_resource type="PackedScene" uid="uid://1yuwjd818iuj" path="res://Prefabs/Environment_Prefabs/fogao.tscn" id="3_8yu0k"]
+[ext_resource type="PackedScene" uid="uid://1yuwjd818iuj" path="res://Prefabs/Environment_Prefabs/Dinner_part/fogao.tscn" id="3_8yu0k"]
 [ext_resource type="Script" uid="uid://bk671c0fjjf0r" path="res://Scripts/KitchenObjectSymbolMap.cs" id="3_gmjel"]
 [ext_resource type="Script" uid="uid://55lxxpkhyy5j" path="res://Scripts/GameManager.cs" id="3_xjyju"]
 [ext_resource type="PackedScene" uid="uid://ua8bq30i4ydb" path="res://Models/player.tscn" id="4_lxp0o"]
-[ext_resource type="PackedScene" uid="uid://bl1rc47irptjd" path="res://Prefabs/Environment_Prefabs/Pia.tscn" id="4_tim8x"]
+[ext_resource type="PackedScene" uid="uid://bl1rc47irptjd" path="res://Prefabs/Environment_Prefabs/Dinner_part/Pia.tscn" id="4_tim8x"]
 [ext_resource type="PackedScene" uid="uid://dlpniyho3no8y" path="res://Prefabs/Environment_Prefabs/Table.tscn" id="5_8pq3l"]
 [ext_resource type="PackedScene" uid="uid://ds3112n2vvdr2" path="res://Prefabs/Environment_Prefabs/Chair.tscn" id="6_6usox"]
-[ext_resource type="PackedScene" uid="uid://dwo7hio4pl0s6" path="res://Prefabs/Environment_Prefabs/Balcao.tscn" id="7_8yu0k"]
-[ext_resource type="PackedScene" uid="uid://vpsrkrvdcm3r" path="res://Prefabs/Environment_Prefabs/maquina_sumo.tscn" id="8_tim8x"]
+[ext_resource type="PackedScene" uid="uid://dwo7hio4pl0s6" path="res://Prefabs/Environment_Prefabs/Dinner_part/Balcao.tscn" id="7_8yu0k"]
+[ext_resource type="PackedScene" uid="uid://m43n2vo1yafo" path="res://Prefabs/Environment_Prefabs/Dinner_part/BalcaoK.tscn" id="8_6usox"]
+[ext_resource type="PackedScene" uid="uid://vpsrkrvdcm3r" path="res://Prefabs/Environment_Prefabs/Dinner_part/maquina_sumo.tscn" id="8_tim8x"]
 [ext_resource type="Script" uid="uid://b0jbij532pcxt" path="res://Scripts/GridManager.cs" id="9_4656x"]
 [ext_resource type="Script" uid="uid://cduux8tcw1er4" path="res://Scripts/CameraRig.cs" id="9_gmjel"]
 [ext_resource type="PackedScene" uid="uid://meyji33pyy2y" path="res://Prefabs/Tiles/Tile.tscn" id="10_gmjel"]
+[ext_resource type="PackedScene" uid="uid://b1x8io06j6t1m" path="res://Prefabs/Environment_Prefabs/Dinner_part/estante_copos.tscn" id="14_8pq3l"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_2miw8"]
 size = Vector3(4.605, 0.04, 8)
@@ -44,7 +46,7 @@ mesh = SubResource("BoxMesh_2miw8")
 skeleton = NodePath("../../../..")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Environment/Place/StaticBody3D"]
-transform = Transform3D(1.73, -0.00124798, 0.00127818, 0.00124757, 1.73, 0.000560216, -0.00127858, -0.000559294, 1.73, 0, 0, 0)
+transform = Transform3D(1.73, -0.00124798, 0.00127818, 0.00124757, 1.73, 0.000560216, -0.00127858, -0.000559294, 1.73, 0, -0.415, 0)
 shape = SubResource("ConvexPolygonShape3D_cr4wk")
 
 [node name="Spawn" type="Node3D" parent="."]
@@ -57,14 +59,9 @@ SinkScene = ExtResource("4_tim8x")
 TableScene = ExtResource("5_8pq3l")
 ChairScene = ExtResource("6_6usox")
 BalcaoScena = ExtResource("7_8yu0k")
+BalcaoKScena = ExtResource("8_6usox")
 SumoScena = ExtResource("8_tim8x")
-
-[node name="GridManager" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.46837, 0.265399, -6.75736)
-script = ExtResource("9_4656x")
-SymbolMapNodePath = NodePath("../KitchenObjectMap")
-TileScene = ExtResource("10_gmjel")
-JogadorScene = ExtResource("4_lxp0o")
+EstCoposScena = ExtResource("14_8pq3l")
 
 [node name="Camera_Position" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49013, 12.1603, 3.88901)
@@ -78,6 +75,13 @@ ZoomMax = 8.0
 transform = Transform3D(1, 0, 0, 0, 0.437068, 0.899428, 0, -0.899428, 0.437068, 0.013463, 2.03136, 1.9375)
 projection = 1
 size = 6.0
+
+[node name="GridManager" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.46837, 0.265399, -6.75736)
+script = ExtResource("9_4656x")
+SymbolMapNodePath = NodePath("../KitchenObjectMap")
+TileScene = ExtResource("10_gmjel")
+JogadorScene = ExtResource("4_lxp0o")
 
 [node name="GameManager" type="Node3D" parent="."]
 script = ExtResource("3_xjyju")

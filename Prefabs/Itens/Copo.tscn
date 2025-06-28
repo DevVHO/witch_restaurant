@@ -1,0 +1,12 @@
+[gd_scene load_steps=3 format=3 uid="uid://cbwnm2xmqkty8"]
+
+[ext_resource type="Script" uid="uid://djawbyxtsks0y" path="res://Scripts/Prefabs/Itens/Copo.cs" id="1_61wi3"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_8pq3l"]
+
+[node name="Copo" type="Node3D"]
+script = ExtResource("1_61wi3")
+
+[node name="Visual" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.25, 0, 0, 0, 0.183669, 0, 0, 0, 0.25, 0, 0.217043, 0)
+mesh = SubResource("CylinderMesh_8pq3l")
